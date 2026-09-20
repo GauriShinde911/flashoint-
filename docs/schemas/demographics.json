@@ -1,0 +1,35 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "demographics",
+  "type": "object",
+  "required": [
+    "region_id",
+    "admin_hierarchy",
+    "population_total",
+    "source",
+    "retrieved_at",
+    "data_quality"
+  ],
+  "properties": {
+    "region_id": { "type": "string" },
+    "admin_hierarchy": {
+      "type": "object",
+      "required": ["country_code", "admin1", "admin2"],
+      "properties": {
+        "country_code": { "type": "string" },
+        "admin1": { "type": "string" },
+        "admin2": { "type": "string" }
+      }
+    },
+    "population_total": { "type": "integer" },
+    "population_rural": { "type": "integer" },
+    "population_urban": { "type": "integer" },
+    "vulnerability_index": { "type": "number", "minimum": 0, "maximum": 1 },
+    "census_year": { "type": "integer", "default": 2011 },
+    "projection_source": { "type": "string", "default": "NFHS-5 (2019-21)" },
+    "source": { "type": "string" },
+    "source_url": { "type": "string" },
+    "retrieved_at": { "type": "string", "format": "date-time" },
+    "data_quality": { "type": "string", "enum": ["real", "synthetic"] }
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "country_code": "IND",
+  "country_name": "India",
+  "currency": "INR",
+  "hierarchy": {
+    "admin0": {
+      "level_name": "Country",
+      "default_value": "India"
+    },
+    "admin1": {
+      "level_name": "State",
+      "pilot_values": ["Maharashtra", "Uttar Pradesh"]
+    },
+    "admin2": {
+      "level_name": "District",
+      "pilot_values": ["Pune", "Thane", "Varanasi", "Gorakhpur"]
+    },
+    "locality": {
+      "level_name": "Village/Ward"
+    }
+  },
+  "supported_languages": [
+    { "code": "en", "name": "English", "native_name": "English" },
+    { "code": "hi", "name": "Hindi", "native_name": "हिन्दी" },
+    { "code": "mr", "name": "Marathi", "native_name": "मराठी" }
+  ],
+  "sectors": [
+    { "id": "healthcare", "label": "Healthcare", "icon": "hospital" },
+    { "id": "water_sanitation", "label": "Water & Sanitation", "icon": "water" },
+    { "id": "roads_transport", "label": "Roads & Transport", "icon": "road" },
+    { "id": "education", "label": "Education", "icon": "school" }
+  ]
+}

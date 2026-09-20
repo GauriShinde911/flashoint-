@@ -1,0 +1,42 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "citizen_request",
+  "type": "object",
+  "required": [
+    "id",
+    "timestamp",
+    "raw_text",
+    "source_channel",
+    "detected_language",
+    "category",
+    "admin_hierarchy",
+    "data_quality"
+  ],
+  "properties": {
+    "id": { "type": "string" },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "raw_text": { "type": "string" },
+    "translated_text": { "type": "string" },
+    "source_channel": { "type": "string", "enum": ["voice", "text", "messaging_app"] },
+    "detected_language": { "type": "string", "enum": ["en", "hi", "mr"] },
+    "category": { "type": "string", "enum": ["healthcare", "water_sanitation", "roads_transport", "education"] },
+    "sub_category": { "type": "string" },
+    "urgency_level": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
+    "admin_hierarchy": {
+      "type": "object",
+      "required": ["country_code", "admin1", "admin2"],
+      "properties": {
+        "country_code": { "type": "string" },
+        "admin1": { "type": "string" },
+        "admin2": { "type": "string" },
+        "locality": { "type": "string" },
+        "latitude": { "type": ["number", "null"] },
+        "longitude": { "type": ["number", "null"] }
+      }
+    },
+    "data_quality": { "type": "string", "enum": ["real", "synthetic"] },
+    "source": { "type": "string", "default": "citizen_input" },
+    "source_url": { "type": ["string", "null"] },
+    "retrieved_at": { "type": "string", "format": "date-time" }
+  }
+}

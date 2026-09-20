@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "government_project",
+  "type": "object",
+  "required": [
+    "project_id",
+    "name",
+    "category",
+    "admin_hierarchy",
+    "budget_inr_cr",
+    "status",
+    "source",
+    "retrieved_at",
+    "data_quality"
+  ],
+  "properties": {
+    "project_id": { "type": "string" },
+    "name": { "type": "string" },
+    "category": { "type": "string", "enum": ["healthcare", "water_sanitation", "roads_transport", "education"] },
+    "admin_hierarchy": {
+      "type": "object",
+      "required": ["country_code", "admin1", "admin2"],
+      "properties": {
+        "country_code": { "type": "string" },
+        "admin1": { "type": "string" },
+        "admin2": { "type": "string" }
+      }
+    },
+    "budget_inr_cr": { "type": "number", "minimum": 0 },
+    "status": { "type": "string", "enum": ["Announced", "Ongoing", "Completed"] },
+    "start_date": { "type": "string", "format": "date" },
+    "completion_date": { "type": ["string", "null"], "format": "date" },
+    "source": { "type": "string" },
+    "source_url": { "type": "string" },
+    "retrieved_at": { "type": "string", "format": "date-time" },
+    "data_quality": { "type": "string", "enum": ["real", "synthetic"] }
+  }
+}

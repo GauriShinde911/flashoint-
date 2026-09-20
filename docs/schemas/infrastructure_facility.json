@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "infrastructure_facility",
+  "type": "object",
+  "required": [
+    "facility_id",
+    "name",
+    "category",
+    "facility_type",
+    "admin_hierarchy",
+    "source",
+    "retrieved_at",
+    "data_quality"
+  ],
+  "properties": {
+    "facility_id": { "type": "string" },
+    "name": { "type": "string" },
+    "category": { "type": "string", "enum": ["healthcare", "water_sanitation", "roads_transport", "education"] },
+    "facility_type": { "type": "string" },
+    "admin_hierarchy": {
+      "type": "object",
+      "required": ["country_code", "admin1", "admin2"],
+      "properties": {
+        "country_code": { "type": "string" },
+        "admin1": { "type": "string" },
+        "admin2": { "type": "string" },
+        "locality": { "type": "string" },
+        "latitude": { "type": ["number", "null"] },
+        "longitude": { "type": ["number", "null"] }
+      }
+    },
+    "status": { "type": "string", "enum": ["operational", "non_functional", "planned"], "default": "operational" },
+    "source": { "type": "string" },
+    "source_url": { "type": "string" },
+    "retrieved_at": { "type": "string", "format": "date-time" },
+    "data_quality": { "type": "string", "enum": ["real", "synthetic"] }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "dataset_version",
+  "type": "object",
+  "required": [
+    "dataset_id",
+    "dataset_name",
+    "category",
+    "version",
+    "record_count",
+    "source_url",
+    "ingested_at",
+    "data_quality"
+  ],
+  "properties": {
+    "dataset_id": { "type": "string" },
+    "dataset_name": { "type": "string" },
+    "category": { "type": "string" },
+    "version": { "type": "string" },
+    "record_count": { "type": "integer" },
+    "source_url": { "type": "string" },
+    "ingested_at": { "type": "string", "format": "date-time" },
+    "data_quality": { "type": "string", "enum": ["real", "synthetic"] },
+    "checksum": { "type": ["string", "null"] }
+  }
+}

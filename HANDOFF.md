@@ -5,7 +5,7 @@
 | STEP | Title | Status |
 | :--- | :--- | :--- |
 | **STEP 0** | Scaffold (Layout, LICENSE, .env.example, CREDITS, README, HANDOFF, /health) | **DONE** |
-| **STEP 1** | Data schema + storage layer (SQLite local default, config/india.json) | TODO |
+| **STEP 1** | Data schema + storage layer (SQLite local default, config/india.json) | **DONE** |
 | **STEP 2** | Healthcare vertical slice: real data (Loaders, pilot districts, ingest.py) | TODO |
 | **STEP 3** | Synthetic citizen requests (150–300 requests, en/hi/mr, time-spread) | TODO |
 | **STEP 4** | Scoring engine (deterministic, weights.json, District C>A>B test) | TODO |
@@ -34,41 +34,36 @@ cp .env.example .env
 # STORAGE_BACKEND=sqlite (local zero-setup SQLite store)
 ```
 
-### Install Dependencies & Run Backend
+### Install Dependencies & Run Tests
 ```bash
 pip install -r backend/requirements.txt
+python -m pytest tests/
+```
+
+### Run Backend API
+```bash
 uvicorn backend.app.main:app --reload --port 8000
-```
-
-### Run Tests
-```bash
-python -m pytest tests/test_health.py
-```
-
-### Run Frontend
-Open `frontend/index.html` directly in your browser or run:
-```bash
-python -m http.server 3000 --directory frontend
 ```
 
 ---
 
 ## What Works
-- Repo structure matching spec: `/backend`, `/frontend`, `/data` (`raw/`, `processed/`, `synthetic/`), `/config`, `/docs`, `/scripts`, `/tests`, `.github/workflows`.
-- Complete license (`LICENSE` MIT), `.env.example`, `CREDITS.md`, `README.md` skeleton, and `/docs/antigravity_build_prompt.md` + `/docs/DATASET_GUIDE.md`.
-- Working `/health` and `/api/health` endpoints returning JSON service status.
+- Repo structure and baseline health endpoints (`/health` and `/api/health`).
+- Open JSON Schemas in `docs/schemas/` for: `citizen_request`, `demographics`, `infrastructure_facility`, `government_project`, and `dataset_version`.
+- Pluggable storage architecture (`backend/app/storage/base.py`) with zero-setup local SQLite implementation (`backend/app/storage/sqlite_store.py`) storing to `data/dpi_local.db`.
+- Generic administrative hierarchy & multilingual configuration in `config/india.json`.
+- 100% test pass across health and storage modules (`tests/test_storage.py`, `tests/test_health.py`).
 
 ## Known Gaps
-- Data schemas and generic location configuration (`config/india.json`) to be implemented in STEP 1.
-- SQLite/storage interface layer to be unified in STEP 1.
+- Real data ingestion scripts and loaders for the 3 pilot districts across 2 states to be implemented in STEP 2.
 
 ---
 
 ## MANUAL TASKS
-- Set `GEMINI_API_KEY` in `.env` if testing live Google GenAI queries (mock mode works without keys).
-- Dataset downloads for live government files (`data.gov.in`) will be managed via loaders in STEP 2.
+- Live API keys for Gemini (`GEMINI_API_KEY`) can be added to `.env` when testing non-mock mode.
+- Government dataset downloads (`data.gov.in`) will be managed via loaders in STEP 2.
 
 ---
 
 ## NEXT STEP
-Proceed to **STEP 1 — Data schema + storage layer**. We will write `/docs/data-schema.md` and standard JSON Schemas for `citizen_request`, `demographics`, `infrastructure_facility`, `government_project`, and `dataset_version`. Implement the pluggable storage interface with local SQLite as the zero-setup offline default, and create `/config/india.json` with the generic 4-level administrative hierarchy and supported language codes (`en`, `hi`, `mr`).
+Proceed to **STEP 2 — Healthcare vertical slice: real data**. Following `DATASET_GUIDE.md`, write loaders for National Hospital Directory (geo-coded), All India Health Centres Directory, and Census 2011 / NFHS-5 district population figures for 3 pilot districts across at least 2 states (e.g. Pune & Thane in Maharashtra, Varanasi in UP). Normalize into our schemas, tag metadata (`source`, `source_url`, `retrieved_at`, `data_quality: "real"`), and implement a rerunnable `scripts/ingest.py` with dataset version tracking.
