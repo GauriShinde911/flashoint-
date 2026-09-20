@@ -1,0 +1,154 @@
+[
+  {
+    "facility_id": "HOSP-MH-PUN-001",
+    "name": "Sassoon General Hospital & B.J. Medical College",
+    "category": "healthcare",
+    "facility_type": "Government Tertiary Teaching Hospital",
+    "admin_hierarchy": {
+      "country_code": "IND",
+      "admin1": "Maharashtra",
+      "admin2": "Pune",
+      "locality": "Station Road, Pune",
+      "latitude": 18.5284,
+      "longitude": 73.8738
+    },
+    "status": "operational",
+    "source": "National Hospital Directory with Geo Code (data.gov.in)",
+    "source_url": "https://data.gov.in/resource/national-hospital-directory-geo-code",
+    "retrieved_at": "2026-09-20T10:00:00Z",
+    "data_quality": "real"
+  },
+  {
+    "facility_id": "HOSP-MH-PUN-002",
+    "name": "Aundh District Hospital",
+    "category": "healthcare",
+    "facility_type": "District Hospital",
+    "admin_hierarchy": {
+      "country_code": "IND",
+      "admin1": "Maharashtra",
+      "admin2": "Pune",
+      "locality": "Aundh, Pune",
+      "latitude": 18.5712,
+      "longitude": 73.8055
+    },
+    "status": "operational",
+    "source": "National Hospital Directory with Geo Code (data.gov.in)",
+    "source_url": "https://data.gov.in/resource/national-hospital-directory-geo-code",
+    "retrieved_at": "2026-09-20T10:00:00Z",
+    "data_quality": "real"
+  },
+  {
+    "facility_id": "HOSP-MH-PUN-003",
+    "name": "Sub-District Hospital Baramati",
+    "category": "healthcare",
+    "facility_type": "Sub-District Hospital (SDH)",
+    "admin_hierarchy": {
+      "country_code": "IND",
+      "admin1": "Maharashtra",
+      "admin2": "Pune",
+      "locality": "Baramati",
+      "latitude": 18.1519,
+      "longitude": 74.5772
+    },
+    "status": "operational",
+    "source": "National Hospital Directory with Geo Code (data.gov.in)",
+    "source_url": "https://data.gov.in/resource/national-hospital-directory-geo-code",
+    "retrieved_at": "2026-09-20T10:00:00Z",
+    "data_quality": "real"
+  },
+  {
+    "facility_id": "HOSP-MH-THA-001",
+    "name": "Chhatrapati Shivaji Maharaj Hospital & Kalwa Medical College",
+    "category": "healthcare",
+    "facility_type": "Civic Teaching Hospital",
+    "admin_hierarchy": {
+      "country_code": "IND",
+      "admin1": "Maharashtra",
+      "admin2": "Thane",
+      "locality": "Kalwa, Thane",
+      "latitude": 19.1963,
+      "longitude": 72.9992
+    },
+    "status": "operational",
+    "source": "National Hospital Directory with Geo Code (data.gov.in)",
+    "source_url": "https://data.gov.in/resource/national-hospital-directory-geo-code",
+    "retrieved_at": "2026-09-20T10:00:00Z",
+    "data_quality": "real"
+  },
+  {
+    "facility_id": "HOSP-MH-THA-002",
+    "name": "Sub-District Hospital Shahapur",
+    "category": "healthcare",
+    "facility_type": "Sub-District Hospital (SDH)",
+    "admin_hierarchy": {
+      "country_code": "IND",
+      "admin1": "Maharashtra",
+      "admin2": "Thane",
+      "locality": "Shahapur",
+      "latitude": 19.4526,
+      "longitude": 73.3283
+    },
+    "status": "operational",
+    "source": "National Hospital Directory with Geo Code (data.gov.in)",
+    "source_url": "https://data.gov.in/resource/national-hospital-directory-geo-code",
+    "retrieved_at": "2026-09-20T10:00:00Z",
+    "data_quality": "real"
+  },
+  {
+    "facility_id": "HOSP-UP-VAR-001",
+    "name": "Sir Sunderlal Hospital (Institute of Medical Sciences, BHU)",
+    "category": "healthcare",
+    "facility_type": "Central Tertiary University Hospital",
+    "admin_hierarchy": {
+      "country_code": "IND",
+      "admin1": "Uttar Pradesh",
+      "admin2": "Varanasi",
+      "locality": "BHU Campus, Varanasi",
+      "latitude": 25.2758,
+      "longitude": 82.9996
+    },
+    "status": "operational",
+    "source": "National Hospital Directory with Geo Code (data.gov.in)",
+    "source_url": "https://data.gov.in/resource/national-hospital-directory-geo-code",
+    "retrieved_at": "2026-09-20T10:00:00Z",
+    "data_quality": "real"
+  },
+  {
+    "facility_id": "HOSP-UP-VAR-002",
+    "name": "Pandit Deen Dayal Upadhyaya District Hospital",
+    "category": "healthcare",
+    "facility_type": "District Hospital",
+    "admin_hierarchy": {
+      "country_code": "IND",
+      "admin1": "Uttar Pradesh",
+      "admin2": "Varanasi",
+      "locality": "Pandeypur, Varanasi",
+      "latitude": 25.3414,
+      "longitude": 82.9912
+    },
+    "status": "operational",
+    "source": "National Hospital Directory with Geo Code (data.gov.in)",
+    "source_url": "https://data.gov.in/resource/national-hospital-directory-geo-code",
+    "retrieved_at": "2026-09-20T10:00:00Z",
+    "data_quality": "real"
+  },
+  {
+    "facility_id": "HOSP-UP-VAR-003",
+    "name": "Lal Bahadur Shastri Hospital",
+    "category": "healthcare",
+    "facility_type": "Sub-Divisional Hospital",
+    "admin_hierarchy": {
+      "country_code": "IND",
+      "admin1": "Uttar Pradesh",
+      "admin2": "Varanasi",
+      "locality": "Ramnagar, Varanasi",
+      "latitude": 25.2678,
+      "longitude": 83.0298
+    },
+    "status": "operational",
+    "source": "National Hospital Directory with Geo Code (data.gov.in)",
+    "source_url": "https://data.gov.in/resource/national-hospital-directory-geo-code",
+    "retrieved_at": "2026-09-20T10:00:00Z",
+    "data_quality": "real"
+  }
+]

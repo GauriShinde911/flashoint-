@@ -1,0 +1,56 @@
+[
+  {
+    "region_id": "IND-MH-PUN",
+    "admin_hierarchy": {
+      "country_code": "IND",
+      "admin1": "Maharashtra",
+      "admin2": "Pune"
+    },
+    "population_total": 9429408,
+    "population_rural": 3673808,
+    "population_urban": 5755600,
+    "vulnerability_index": 0.42,
+    "census_year": 2011,
+    "projection_source": "NFHS-5 (2019-21) Factsheet Maharashtra",
+    "source": "Office of the Registrar General & Census Commissioner, India (Census 2011) + NFHS-5 IIPS",
+    "source_url": "https://censusindia.gov.in / http://rchiips.org/nfhs/factsheet_NFHS-5.shtml",
+    "retrieved_at": "2026-09-20T10:00:00Z",
+    "data_quality": "real"
+  },
+  {
+    "region_id": "IND-MH-THA",
+    "admin_hierarchy": {
+      "country_code": "IND",
+      "admin1": "Maharashtra",
+      "admin2": "Thane"
+    },
+    "population_total": 8070032,
+    "population_rural": 1864210,
+    "population_urban": 6205822,
+    "vulnerability_index": 0.48,
+    "census_year": 2011,
+    "projection_source": "NFHS-5 (2019-21) Factsheet Maharashtra",
+    "source": "Office of the Registrar General & Census Commissioner, India (Census 2011) + NFHS-5 IIPS",
+    "source_url": "https://censusindia.gov.in / http://rchiips.org/nfhs/factsheet_NFHS-5.shtml",
+    "retrieved_at": "2026-09-20T10:00:00Z",
+    "data_quality": "real"
+  },
+  {
+    "region_id": "IND-UP-VAR",
+    "admin_hierarchy": {
+      "country_code": "IND",
+      "admin1": "Uttar Pradesh",
+      "admin2": "Varanasi"
+    },
+    "population_total": 3676841,
+    "population_rural": 2079796,
+    "population_urban": 1597045,
+    "vulnerability_index": 0.61,
+    "census_year": 2011,
+    "projection_source": "NFHS-5 (2019-21) Factsheet Uttar Pradesh",
+    "source": "Office of the Registrar General & Census Commissioner, India (Census 2011) + NFHS-5 IIPS",
+    "source_url": "https://censusindia.gov.in / http://rchiips.org/nfhs/factsheet_NFHS-5.shtml",
+    "retrieved_at": "2026-09-20T10:00:00Z",
+    "data_quality": "real"
+  }
+]

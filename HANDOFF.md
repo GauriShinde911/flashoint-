@@ -6,7 +6,7 @@
 | :--- | :--- | :--- |
 | **STEP 0** | Scaffold (Layout, LICENSE, .env.example, CREDITS, README, HANDOFF, /health) | **DONE** |
 | **STEP 1** | Data schema + storage layer (SQLite local default, config/india.json) | **DONE** |
-| **STEP 2** | Healthcare vertical slice: real data (Loaders, pilot districts, ingest.py) | TODO |
+| **STEP 2** | Healthcare vertical slice: real data (Loaders, pilot districts, ingest.py) | **DONE** |
 | **STEP 3** | Synthetic citizen requests (150–300 requests, en/hi/mr, time-spread) | TODO |
 | **STEP 4** | Scoring engine (deterministic, weights.json, District C>A>B test) | TODO |
 | **STEP 5** | Impact Measurement Engine (Pre vs Post completion comparison) | TODO |
@@ -34,9 +34,13 @@ cp .env.example .env
 # STORAGE_BACKEND=sqlite (local zero-setup SQLite store)
 ```
 
-### Install Dependencies & Run Tests
+### Ingest Real Healthcare & Demographic Data
 ```bash
-pip install -r backend/requirements.txt
+python scripts/ingest.py
+```
+
+### Run Tests
+```bash
 python -m pytest tests/
 ```
 
@@ -48,22 +52,27 @@ uvicorn backend.app.main:app --reload --port 8000
 ---
 
 ## What Works
-- Repo structure and baseline health endpoints (`/health` and `/api/health`).
-- Open JSON Schemas in `docs/schemas/` for: `citizen_request`, `demographics`, `infrastructure_facility`, `government_project`, and `dataset_version`.
-- Pluggable storage architecture (`backend/app/storage/base.py`) with zero-setup local SQLite implementation (`backend/app/storage/sqlite_store.py`) storing to `data/dpi_local.db`.
-- Generic administrative hierarchy & multilingual configuration in `config/india.json`.
-- 100% test pass across health and storage modules (`tests/test_storage.py`, `tests/test_health.py`).
+- **Scaffolding & Architecture**: Fast, lightweight, zero-cost stack with `/health` and `/api/health`.
+- **Open Schemas & Storage**: JSON Schemas in `docs/schemas/`, pluggable SQLite storage in `data/dpi_local.db`.
+- **Real Healthcare & Demographics Ingestion (STEP 2)**:
+  - 3 pilot districts across 2 states: **Pune** (MH), **Thane** (MH), and **Varanasi** (UP).
+  - Verified geo-coded hospitals from National Hospital Directory (`data.gov.in`).
+  - Verified PHCs and CHCs from All India Health Centres Directory (`data.gov.in`).
+  - Real baseline population figures from **Census 2011** combined with **NFHS-5 (2019-21)** district estimates.
+  - All records tagged with `source`, `source_url`, `retrieved_at`, and `data_quality: "real"`.
+  - Lineage tracking via `dataset_version` entries (`national_hospital_directory_v1`, `all_india_health_centres_v1`, `census_nfhs5_demographics_v1`).
+- **Tests**: 7/7 tests passing (`test_health.py`, `test_storage.py`, `test_ingest.py`).
 
 ## Known Gaps
-- Real data ingestion scripts and loaders for the 3 pilot districts across 2 states to be implemented in STEP 2.
+- Ingestion of synthetic citizen demand dataset (150-300 records) targeted specifically to these 3 pilot districts with time spreads to be implemented in STEP 3.
 
 ---
 
 ## MANUAL TASKS
-- Live API keys for Gemini (`GEMINI_API_KEY`) can be added to `.env` when testing non-mock mode.
-- Government dataset downloads (`data.gov.in`) will be managed via loaders in STEP 2.
+- Set `GEMINI_API_KEY` in `.env` if testing non-mock Gemini queries.
+- For production expansion beyond pilot districts, full national data.gov.in CSV extracts can be fetched and loaded with the same loader contracts.
 
 ---
 
 ## NEXT STEP
-Proceed to **STEP 2 — Healthcare vertical slice: real data**. Following `DATASET_GUIDE.md`, write loaders for National Hospital Directory (geo-coded), All India Health Centres Directory, and Census 2011 / NFHS-5 district population figures for 3 pilot districts across at least 2 states (e.g. Pune & Thane in Maharashtra, Varanasi in UP). Normalize into our schemas, tag metadata (`source`, `source_url`, `retrieved_at`, `data_quality: "real"`), and implement a rerunnable `scripts/ingest.py` with dataset version tracking.
+Proceed to **STEP 3 — Synthetic citizen requests**. Generate 150–300 requests restricted exclusively to the 3 pilot districts from STEP 2 (Pune, Thane, Varanasi). Generate across English, Hindi, and Marathi across voice, text, and messaging app channels with varied phrasing for identical needs. Include timestamps spread across time (necessary for the before/after impact measurement in STEP 5). Tag all records with `data_quality: "synthetic"`, save to `data/synthetic/`, and integrate loading into `scripts/ingest.py`.

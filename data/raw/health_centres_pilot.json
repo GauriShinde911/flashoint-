@@ -1,0 +1,154 @@
+[
+  {
+    "facility_id": "HC-MH-PUN-001",
+    "name": "Khadakwasla Primary Health Centre (PHC)",
+    "category": "healthcare",
+    "facility_type": "Primary Health Centre (PHC)",
+    "admin_hierarchy": {
+      "country_code": "IND",
+      "admin1": "Maharashtra",
+      "admin2": "Pune",
+      "locality": "Khadakwasla, Haveli",
+      "latitude": 18.4357,
+      "longitude": 73.7629
+    },
+    "status": "operational",
+    "source": "All India Health Centres Directory (data.gov.in)",
+    "source_url": "https://data.gov.in/resource/all-india-health-centres-directory",
+    "retrieved_at": "2026-09-20T10:00:00Z",
+    "data_quality": "real"
+  },
+  {
+    "facility_id": "HC-MH-PUN-002",
+    "name": "Wagholi Primary Health Centre (PHC)",
+    "category": "healthcare",
+    "facility_type": "Primary Health Centre (PHC)",
+    "admin_hierarchy": {
+      "country_code": "IND",
+      "admin1": "Maharashtra",
+      "admin2": "Pune",
+      "locality": "Wagholi, Haveli",
+      "latitude": 18.5793,
+      "longitude": 73.9818
+    },
+    "status": "operational",
+    "source": "All India Health Centres Directory (data.gov.in)",
+    "source_url": "https://data.gov.in/resource/all-india-health-centres-directory",
+    "retrieved_at": "2026-09-20T10:00:00Z",
+    "data_quality": "real"
+  },
+  {
+    "facility_id": "HC-MH-PUN-003",
+    "name": "Manchar Community Health Centre (CHC)",
+    "category": "healthcare",
+    "facility_type": "Community Health Centre (CHC)",
+    "admin_hierarchy": {
+      "country_code": "IND",
+      "admin1": "Maharashtra",
+      "admin2": "Pune",
+      "locality": "Manchar, Ambegaon",
+      "latitude": 19.0069,
+      "longitude": 73.9427
+    },
+    "status": "operational",
+    "source": "All India Health Centres Directory (data.gov.in)",
+    "source_url": "https://data.gov.in/resource/all-india-health-centres-directory",
+    "retrieved_at": "2026-09-20T10:00:00Z",
+    "data_quality": "real"
+  },
+  {
+    "facility_id": "HC-MH-THA-001",
+    "name": "Padgha Primary Health Centre (PHC)",
+    "category": "healthcare",
+    "facility_type": "Primary Health Centre (PHC)",
+    "admin_hierarchy": {
+      "country_code": "IND",
+      "admin1": "Maharashtra",
+      "admin2": "Thane",
+      "locality": "Padgha, Bhiwandi",
+      "latitude": 19.3497,
+      "longitude": 73.1678
+    },
+    "status": "operational",
+    "source": "All India Health Centres Directory (data.gov.in)",
+    "source_url": "https://data.gov.in/resource/all-india-health-centres-directory",
+    "retrieved_at": "2026-09-20T10:00:00Z",
+    "data_quality": "real"
+  },
+  {
+    "facility_id": "HC-MH-THA-002",
+    "name": "Murbad Community Health Centre (CHC)",
+    "category": "healthcare",
+    "facility_type": "Community Health Centre (CHC)",
+    "admin_hierarchy": {
+      "country_code": "IND",
+      "admin1": "Maharashtra",
+      "admin2": "Thane",
+      "locality": "Murbad",
+      "latitude": 19.2562,
+      "longitude": 73.4001
+    },
+    "status": "operational",
+    "source": "All India Health Centres Directory (data.gov.in)",
+    "source_url": "https://data.gov.in/resource/all-india-health-centres-directory",
+    "retrieved_at": "2026-09-20T10:00:00Z",
+    "data_quality": "real"
+  },
+  {
+    "facility_id": "HC-UP-VAR-001",
+    "name": "Pindra Community Health Centre (CHC)",
+    "category": "healthcare",
+    "facility_type": "Community Health Centre (CHC)",
+    "admin_hierarchy": {
+      "country_code": "IND",
+      "admin1": "Uttar Pradesh",
+      "admin2": "Varanasi",
+      "locality": "Pindra",
+      "latitude": 25.5034,
+      "longitude": 82.8091
+    },
+    "status": "operational",
+    "source": "All India Health Centres Directory (data.gov.in)",
+    "source_url": "https://data.gov.in/resource/all-india-health-centres-directory",
+    "retrieved_at": "2026-09-20T10:00:00Z",
+    "data_quality": "real"
+  },
+  {
+    "facility_id": "HC-UP-VAR-002",
+    "name": "Arajiline Community Health Centre (CHC)",
+    "category": "healthcare",
+    "facility_type": "Community Health Centre (CHC)",
+    "admin_hierarchy": {
+      "country_code": "IND",
+      "admin1": "Uttar Pradesh",
+      "admin2": "Varanasi",
+      "locality": "Raja Talab, Arajiline",
+      "latitude": 25.2671,
+      "longitude": 82.8594
+    },
+    "status": "operational",
+    "source": "All India Health Centres Directory (data.gov.in)",
+    "source_url": "https://data.gov.in/resource/all-india-health-centres-directory",
+    "retrieved_at": "2026-09-20T10:00:00Z",
+    "data_quality": "real"
+  },
+  {
+    "facility_id": "HC-UP-VAR-003",
+    "name": "Cholapur Primary Health Centre (PHC)",
+    "category": "healthcare",
+    "facility_type": "Primary Health Centre (PHC)",
+    "admin_hierarchy": {
+      "country_code": "IND",
+      "admin1": "Uttar Pradesh",
+      "admin2": "Varanasi",
+      "locality": "Cholapur",
+      "latitude": 25.4497,
+      "longitude": 83.0768
+    },
+    "status": "operational",
+    "source": "All India Health Centres Directory (data.gov.in)",
+    "source_url": "https://data.gov.in/resource/all-india-health-centres-directory",
+    "retrieved_at": "2026-09-20T10:00:00Z",
+    "data_quality": "real"
+  }
+]
