@@ -15,13 +15,14 @@ from backend.app.storage import get_storage
 from backend.app.loaders.hospital_loader import load_hospitals
 from backend.app.loaders.health_centre_loader import load_health_centres
 from backend.app.loaders.demographics_loader import load_demographics
+from backend.app.loaders.synthetic_requests_loader import load_synthetic_requests
 
 def run_ingestion():
     store = get_storage()
     now_iso = datetime.utcnow().isoformat() + "Z"
 
     print("==========================================================")
-    print("STARTING DATA INGESTION PIPELINE (Healthcare Slice)")
+    print("STARTING DATA INGESTION PIPELINE (Healthcare Slice & Citizen Demand)")
     print("==========================================================")
 
     # 1. Ingest National Hospital Directory
@@ -84,9 +85,30 @@ def run_ingestion():
         print(f"[ERROR] Failed to ingest demographics: {e}")
         raise
 
+    # 4. Ingest Synthetic Citizen Requests
+    try:
+        requests = load_synthetic_requests()
+        for req in requests:
+            store.save_citizen_request(req)
+        store.record_dataset_version({
+            "dataset_id": "synthetic_citizen_requests_v1",
+            "dataset_name": "Multilingual Synthetic Citizen Demand Dataset",
+            "category": "citizen_requests",
+            "version": "2026.09",
+            "record_count": len(requests),
+            "source_url": None,
+            "ingested_at": now_iso,
+            "data_quality": "synthetic"
+        })
+        print(f"[SUCCESS] Ingested {len(requests)} synthetic citizen requests across Pune, Thane, Varanasi")
+    except Exception as e:
+        print(f"[ERROR] Failed to ingest synthetic citizen requests: {e}")
+        raise
+
     print("==========================================================")
-    print("INGESTION COMPLETE — Real data populated into SQLite store")
+    print("INGESTION COMPLETE — Real & Synthetic data populated into SQLite store")
     print("==========================================================")
 
 if __name__ == "__main__":
     run_ingestion()
+

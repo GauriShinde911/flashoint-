@@ -18,11 +18,12 @@ PILOT_REGIONS = [
     {"country_code": "IND", "admin1": "Maharashtra", "admin2": "Pune", "admin3": "Haveli", "lat": 18.5204, "lon": 73.8567},
     {"country_code": "IND", "admin1": "Maharashtra", "admin2": "Pune", "admin3": "Baramati", "lat": 18.1519, "lon": 74.5772},
     {"country_code": "IND", "admin1": "Maharashtra", "admin2": "Thane", "admin3": "Kalyan", "lat": 19.2403, "lon": 73.1305},
+    {"country_code": "IND", "admin1": "Maharashtra", "admin2": "Thane", "admin3": "Bhiwandi", "lat": 19.2968, "lon": 73.0631},
     {"country_code": "IND", "admin1": "Uttar Pradesh", "admin2": "Varanasi", "admin3": "Pindra", "lat": 25.3176, "lon": 82.9739},
-    {"country_code": "IND", "admin1": "Uttar Pradesh", "admin2": "Gorakhpur", "admin3": "Sahjanwa", "lat": 26.7606, "lon": 83.3732},
+    {"country_code": "IND", "admin1": "Uttar Pradesh", "admin2": "Varanasi", "admin3": "Sadha", "lat": 25.3350, "lon": 82.9800},
 ]
 
-CHANNELS = ["voice_web_speech", "text_web_portal", "messaging_app"]
+CHANNELS = ["voice", "text", "messaging_app"]
 
 REQUEST_TEMPLATES = [
     # Healthcare
@@ -79,7 +80,7 @@ REQUEST_TEMPLATES = [
     }
 ]
 
-def generate_synthetic_dataset(count: int = 200, output_path: str = "data/synthetic/citizen_requests.json"):
+def generate_synthetic_dataset(count: int = 220, output_path: str = "data/synthetic/citizen_requests.json"):
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     records = []
     base_time = datetime.utcnow()
@@ -89,8 +90,8 @@ def generate_synthetic_dataset(count: int = 200, output_path: str = "data/synthe
         lang, raw_text, translated = random.choice(template["variants"])
         region = random.choice(PILOT_REGIONS)
         channel = random.choice(CHANNELS)
-        days_ago = random.randint(1, 180)
-        timestamp = (base_time - timedelta(days=days_ago, hours=random.randint(0, 23))).isoformat() + "Z"
+        days_ago = random.randint(5, 450)
+        timestamp = (base_time - timedelta(days=days_ago, hours=random.randint(0, 23), minutes=random.randint(0, 59))).isoformat() + "Z"
 
         record = {
             "id": f"REQ-SYNTH-{str(uuid.uuid4())[:8].upper()}",
@@ -106,12 +107,15 @@ def generate_synthetic_dataset(count: int = 200, output_path: str = "data/synthe
                 "country_code": region["country_code"],
                 "admin1": region["admin1"],
                 "admin2": region["admin2"],
-                "admin3": region["admin3"],
+                "locality": region["admin3"],
                 "latitude": round(region["lat"] + random.uniform(-0.04, 0.04), 4),
                 "longitude": round(region["lon"] + random.uniform(-0.04, 0.04), 4)
             },
             "cluster_id": f"CLUSTER-{template['category'][:3].upper()}-{region['admin2'][:3].upper()}",
-            "data_quality": "synthetic"
+            "data_quality": "synthetic",
+            "source": "citizen_input",
+            "source_url": None,
+            "retrieved_at": timestamp
         }
         records.append(record)
 
@@ -119,7 +123,7 @@ def generate_synthetic_dataset(count: int = 200, output_path: str = "data/synthe
         json.dump(records, f, indent=2, ensure_ascii=False)
 
     print(f"[SUCCESS] Generated {len(records)} synthetic records at {output_path}")
-    print(f"Sample Record:\n{json.dumps(records[0], indent=2, ensure_ascii=False)}")
 
 if __name__ == "__main__":
     generate_synthetic_dataset(220)
+

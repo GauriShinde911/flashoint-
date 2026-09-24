@@ -7,7 +7,7 @@
 | **STEP 0** | Scaffold (Layout, LICENSE, .env.example, CREDITS, README, HANDOFF, /health) | **DONE** |
 | **STEP 1** | Data schema + storage layer (SQLite local default, config/india.json) | **DONE** |
 | **STEP 2** | Healthcare vertical slice: real data (Loaders, pilot districts, ingest.py) | **DONE** |
-| **STEP 3** | Synthetic citizen requests (150–300 requests, en/hi/mr, time-spread) | TODO |
+| **STEP 3** | Synthetic citizen requests (150–300 requests, en/hi/mr, time-spread) | **DONE** |
 | **STEP 4** | Scoring engine (deterministic, weights.json, District C>A>B test) | TODO |
 | **STEP 5** | Impact Measurement Engine (Pre vs Post completion comparison) | TODO |
 | **STEP 6** | Gemini understanding layer (ADK / pipeline, USE_MOCK_GEMINI) | TODO |
@@ -34,7 +34,7 @@ cp .env.example .env
 # STORAGE_BACKEND=sqlite (local zero-setup SQLite store)
 ```
 
-### Ingest Real Healthcare & Demographic Data
+### Ingest Real & Synthetic Data
 ```bash
 python scripts/ingest.py
 ```
@@ -59,12 +59,18 @@ uvicorn backend.app.main:app --reload --port 8000
   - Verified geo-coded hospitals from National Hospital Directory (`data.gov.in`).
   - Verified PHCs and CHCs from All India Health Centres Directory (`data.gov.in`).
   - Real baseline population figures from **Census 2011** combined with **NFHS-5 (2019-21)** district estimates.
-  - All records tagged with `source`, `source_url`, `retrieved_at`, and `data_quality: "real"`.
   - Lineage tracking via `dataset_version` entries (`national_hospital_directory_v1`, `all_india_health_centres_v1`, `census_nfhs5_demographics_v1`).
-- **Tests**: 7/7 tests passing (`test_health.py`, `test_storage.py`, `test_ingest.py`).
+- **Synthetic Citizen Demand Ingestion (STEP 3)**:
+  - 220 synthetic citizen requests exclusively targeting Pune, Thane, and Varanasi.
+  - Multilingual support: English (`en`), Hindi (`hi`), Marathi (`mr`).
+  - Channels: `voice`, `text`, `messaging_app`.
+  - Phrasing variations per `DATASET_GUIDE.md` across healthcare, water/sanitation, roads/transport, and education.
+  - Timestamps spread across 5–450 days ago for before/after impact measurement testing.
+  - Tagged with `data_quality: "synthetic"` and recorded in dataset version lineage (`synthetic_citizen_requests_v1`).
+- **Tests**: 9/9 tests passing (`test_health.py`, `test_storage.py`, `test_ingest.py`, `test_synthetic_requests.py`).
 
 ## Known Gaps
-- Ingestion of synthetic citizen demand dataset (150-300 records) targeted specifically to these 3 pilot districts with time spreads to be implemented in STEP 3.
+- Deterministic scoring engine (`backend/engine/`) computing Priority Score (0-100) with configurable weights and District C > A > B sanity assertion test to be implemented in STEP 4.
 
 ---
 
@@ -75,4 +81,4 @@ uvicorn backend.app.main:app --reload --port 8000
 ---
 
 ## NEXT STEP
-Proceed to **STEP 3 — Synthetic citizen requests**. Generate 150–300 requests restricted exclusively to the 3 pilot districts from STEP 2 (Pune, Thane, Varanasi). Generate across English, Hindi, and Marathi across voice, text, and messaging app channels with varied phrasing for identical needs. Include timestamps spread across time (necessary for the before/after impact measurement in STEP 5). Tag all records with `data_quality: "synthetic"`, save to `data/synthetic/`, and integrate loading into `scripts/ingest.py`.
+Proceed to **STEP 4 — Scoring engine (deterministic, no Gemini) + sanity test**. Implement `backend/engine/` Priority Score (0–100) = demand x population affected x infra deficit x accessibility x inverse investment, with configurable weights in `config/weights.json` and per-input breakdown returned with every score. Write `tests/test_worked_example.py` asserting District C > A > B per `DATASET_GUIDE.md`. Also implement Silent Need Detector, Investment–Demand Mismatch, and Existing-Project Check.
