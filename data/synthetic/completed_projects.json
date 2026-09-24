@@ -1,0 +1,50 @@
+[
+  {
+    "project_id": "PROJ-COMP-001",
+    "name": "Kalyan Sub-District Hospital & Emergency Block",
+    "sector": "healthcare",
+    "admin_hierarchy": {
+      "country_code": "IND",
+      "admin1": "Maharashtra",
+      "admin2": "Thane",
+      "locality": "Kalyan"
+    },
+    "status": "Completed",
+    "budget_inr_cr": 14.5,
+    "completion_date": "2025-10-01",
+    "data_quality": "synthetic",
+    "source": "government_project_portal"
+  },
+  {
+    "project_id": "PROJ-COMP-002",
+    "name": "Haveli Clean Water Pipeline & Storage Tank",
+    "sector": "water_sanitation",
+    "admin_hierarchy": {
+      "country_code": "IND",
+      "admin1": "Maharashtra",
+      "admin2": "Pune",
+      "locality": "Haveli"
+    },
+    "status": "Completed",
+    "budget_inr_cr": 6.8,
+    "completion_date": "2025-11-15",
+    "data_quality": "synthetic",
+    "source": "government_project_portal"
+  },
+  {
+    "project_id": "PROJ-COMP-003",
+    "name": "Pindra All-Weather Highway Link Road",
+    "sector": "roads_transport",
+    "admin_hierarchy": {
+      "country_code": "IND",
+      "admin1": "Uttar Pradesh",
+      "admin2": "Varanasi",
+      "locality": "Pindra"
+    },
+    "status": "Completed",
+    "budget_inr_cr": 11.2,
+    "completion_date": "2025-08-20",
+    "data_quality": "synthetic",
+    "source": "government_project_portal"
+  }
+]

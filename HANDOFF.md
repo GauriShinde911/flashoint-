@@ -9,7 +9,7 @@
 | **STEP 2** | Healthcare vertical slice: real data (Loaders, pilot districts, ingest.py) | **DONE** |
 | **STEP 3** | Synthetic citizen requests (150–300 requests, en/hi/mr, time-spread) | **DONE** |
 | **STEP 4** | Scoring engine (deterministic, weights.json, District C>A>B test) | **DONE** |
-| **STEP 5** | Impact Measurement Engine (Pre vs Post completion comparison) | TODO |
+| **STEP 5** | Impact Measurement Engine (Pre vs Post completion comparison) | **DONE** |
 | **STEP 6** | Gemini understanding layer (ADK / pipeline, USE_MOCK_GEMINI) | TODO |
 | **STEP 7** | Gemini explanation layer + NL query (/explain, /query) | TODO |
 | **STEP 8** | Backend API completion (CORS, validation, endpoints, tests) | TODO |
@@ -74,10 +74,15 @@ uvicorn backend.app.main:app --reload --port 8000
   - Includes **Investment-Demand Mismatch Detector** (`backend/engine/mismatch_detector.py`) highlighting over-funded vs under-funded districts.
   - Includes **Existing-Project Check** (`backend/engine/project_check.py`) evaluating ongoing and completed government project coverage.
   - Verified with Worked Sanity Check (`tests/test_worked_example.py`) strictly asserting score order: **District C > District A > District B**.
-- **Tests**: 13/13 tests passing (`test_health.py`, `test_storage.py`, `test_ingest.py`, `test_synthetic_requests.py`, `test_worked_example.py`).
+- **Impact Measurement Engine (STEP 5)**:
+  - Implemented in `backend/engine/impact_engine.py`.
+  - Compares citizen request volume in equal time windows (e.g. 90/180 days) BEFORE vs AFTER project completion dates.
+  - Seeded 3 completed government projects (`data/synthetic/completed_projects.json`) with before/after request timestamps demonstrating demand reduction.
+  - Includes mandatory disclaimer: `"based on available data, not a guarantee"`.
+- **Tests**: 17/17 tests passing (`test_health.py`, `test_storage.py`, `test_ingest.py`, `test_synthetic_requests.py`, `test_worked_example.py`, `test_impact_engine.py`).
 
 ## Known Gaps
-- Impact Measurement Engine (`backend/engine/impact_engine.py`) comparing request volume & priority score in equal windows BEFORE vs AFTER project completion to be implemented in STEP 5.
+- Gemini understanding layer pipeline (`backend/services/gemini_service.py`) performing language detection, category/urgency classification, location/entity extraction, and semantic clustering with `USE_MOCK_GEMINI` support to be implemented in STEP 6.
 
 ---
 
@@ -88,4 +93,4 @@ uvicorn backend.app.main:app --reload --port 8000
 ---
 
 ## NEXT STEP
-Proceed to **STEP 5 — Impact Measurement Engine**. For projects with status "Completed" and a completion date, compare request volume / priority score for that category+region in equal windows BEFORE vs AFTER completion, using request timestamps. Output a measured Impact Score with exact numbers, window sizes, and label "based on available data, not a guarantee". Seed 2–3 synthetic completed projects with request timestamps demonstrating a drop (clearly labeled synthetic). Add tests.
+Proceed to **STEP 6 — Gemini understanding layer**. Build backend service (key server-side only) that does: language detection, category/urgency classification, location+entity extraction, semantic clustering of related requests. Structure as a clean pipeline supporting `USE_MOCK_GEMINI=true|false`. Endpoint: `POST /requests` (text in, structured demand out). Add unit tests.

@@ -16,6 +16,7 @@ from backend.app.loaders.hospital_loader import load_hospitals
 from backend.app.loaders.health_centre_loader import load_health_centres
 from backend.app.loaders.demographics_loader import load_demographics
 from backend.app.loaders.synthetic_requests_loader import load_synthetic_requests
+from backend.app.loaders.projects_loader import load_government_projects
 
 def run_ingestion():
     store = get_storage()
@@ -105,9 +106,30 @@ def run_ingestion():
         print(f"[ERROR] Failed to ingest synthetic citizen requests: {e}")
         raise
 
+    # 5. Ingest Government Projects
+    try:
+        projects = load_government_projects()
+        for proj in projects:
+            store.save_government_project(proj)
+        store.record_dataset_version({
+            "dataset_id": "completed_government_projects_v1",
+            "dataset_name": "Completed & Ongoing Public Projects Registry",
+            "category": "government_projects",
+            "version": "2026.09",
+            "record_count": len(projects),
+            "source_url": None,
+            "ingested_at": now_iso,
+            "data_quality": "synthetic"
+        })
+        print(f"[SUCCESS] Ingested {len(projects)} government project records")
+    except Exception as e:
+        print(f"[ERROR] Failed to ingest government projects: {e}")
+        raise
+
     print("==========================================================")
     print("INGESTION COMPLETE — Real & Synthetic data populated into SQLite store")
     print("==========================================================")
+
 
 if __name__ == "__main__":
     run_ingestion()
