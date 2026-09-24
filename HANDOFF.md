@@ -8,7 +8,7 @@
 | **STEP 1** | Data schema + storage layer (SQLite local default, config/india.json) | **DONE** |
 | **STEP 2** | Healthcare vertical slice: real data (Loaders, pilot districts, ingest.py) | **DONE** |
 | **STEP 3** | Synthetic citizen requests (150–300 requests, en/hi/mr, time-spread) | **DONE** |
-| **STEP 4** | Scoring engine (deterministic, weights.json, District C>A>B test) | TODO |
+| **STEP 4** | Scoring engine (deterministic, weights.json, District C>A>B test) | **DONE** |
 | **STEP 5** | Impact Measurement Engine (Pre vs Post completion comparison) | TODO |
 | **STEP 6** | Gemini understanding layer (ADK / pipeline, USE_MOCK_GEMINI) | TODO |
 | **STEP 7** | Gemini explanation layer + NL query (/explain, /query) | TODO |
@@ -67,10 +67,17 @@ uvicorn backend.app.main:app --reload --port 8000
   - Phrasing variations per `DATASET_GUIDE.md` across healthcare, water/sanitation, roads/transport, and education.
   - Timestamps spread across 5–450 days ago for before/after impact measurement testing.
   - Tagged with `data_quality: "synthetic"` and recorded in dataset version lineage (`synthetic_citizen_requests_v1`).
-- **Tests**: 9/9 tests passing (`test_health.py`, `test_storage.py`, `test_ingest.py`, `test_synthetic_requests.py`).
+- **Deterministic Priority Scoring Engine (STEP 4)**:
+  - Implemented in `backend/engine/scoring.py` with configurable weights in `config/weights.json`.
+  - Exposes per-input breakdowns and exact weight lineage with every score.
+  - Includes **Silent Need Detector** (`backend/engine/silent_need_detector.py`) identifying high-pop, high-deficit regions with low reporting.
+  - Includes **Investment-Demand Mismatch Detector** (`backend/engine/mismatch_detector.py`) highlighting over-funded vs under-funded districts.
+  - Includes **Existing-Project Check** (`backend/engine/project_check.py`) evaluating ongoing and completed government project coverage.
+  - Verified with Worked Sanity Check (`tests/test_worked_example.py`) strictly asserting score order: **District C > District A > District B**.
+- **Tests**: 13/13 tests passing (`test_health.py`, `test_storage.py`, `test_ingest.py`, `test_synthetic_requests.py`, `test_worked_example.py`).
 
 ## Known Gaps
-- Deterministic scoring engine (`backend/engine/`) computing Priority Score (0-100) with configurable weights and District C > A > B sanity assertion test to be implemented in STEP 4.
+- Impact Measurement Engine (`backend/engine/impact_engine.py`) comparing request volume & priority score in equal windows BEFORE vs AFTER project completion to be implemented in STEP 5.
 
 ---
 
@@ -81,4 +88,4 @@ uvicorn backend.app.main:app --reload --port 8000
 ---
 
 ## NEXT STEP
-Proceed to **STEP 4 — Scoring engine (deterministic, no Gemini) + sanity test**. Implement `backend/engine/` Priority Score (0–100) = demand x population affected x infra deficit x accessibility x inverse investment, with configurable weights in `config/weights.json` and per-input breakdown returned with every score. Write `tests/test_worked_example.py` asserting District C > A > B per `DATASET_GUIDE.md`. Also implement Silent Need Detector, Investment–Demand Mismatch, and Existing-Project Check.
+Proceed to **STEP 5 — Impact Measurement Engine**. For projects with status "Completed" and a completion date, compare request volume / priority score for that category+region in equal windows BEFORE vs AFTER completion, using request timestamps. Output a measured Impact Score with exact numbers, window sizes, and label "based on available data, not a guarantee". Seed 2–3 synthetic completed projects with request timestamps demonstrating a drop (clearly labeled synthetic). Add tests.

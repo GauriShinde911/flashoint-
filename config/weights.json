@@ -1,0 +1,15 @@
+{
+  "weights": {
+    "demand": 0.30,
+    "population": 0.25,
+    "infra_deficit": 0.25,
+    "accessibility": 0.10,
+    "inverse_investment": 0.10
+  },
+  "normalization_bounds": {
+    "demand_max": 300,
+    "population_max": 2000000,
+    "infra_facilities_max": 20,
+    "investment_max_cr": 25.0
+  }
+}
