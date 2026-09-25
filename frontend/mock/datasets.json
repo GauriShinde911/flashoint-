@@ -1,0 +1,45 @@
+{
+  "datasets": [
+    {
+      "dataset_id": "national_hospital_directory_v1",
+      "dataset_name": "National Hospital Directory with Geo Code",
+      "category": "healthcare",
+      "version": "2026.09",
+      "record_count": 8,
+      "source_url": "https://data.gov.in/resource/national-hospital-directory-geo-code",
+      "ingested_at": "2026-09-24T12:00:00Z",
+      "data_quality": "real"
+    },
+    {
+      "dataset_id": "all_india_health_centres_v1",
+      "dataset_name": "All India Health Centres Directory",
+      "category": "healthcare",
+      "version": "2026.09",
+      "record_count": 8,
+      "source_url": "https://data.gov.in/resource/all-india-health-centres-directory",
+      "ingested_at": "2026-09-24T12:00:00Z",
+      "data_quality": "real"
+    },
+    {
+      "dataset_id": "census_nfhs5_demographics_v1",
+      "dataset_name": "Census 2011 Demographics & NFHS-5 District Estimates",
+      "category": "demographics",
+      "version": "2026.09",
+      "record_count": 3,
+      "source_url": "https://censusindia.gov.in",
+      "ingested_at": "2026-09-24T12:00:00Z",
+      "data_quality": "real"
+    },
+    {
+      "dataset_id": "synthetic_citizen_requests_v1",
+      "dataset_name": "Multilingual Synthetic Citizen Demand Dataset",
+      "category": "citizen_requests",
+      "version": "2026.09",
+      "record_count": 220,
+      "source_url": null,
+      "ingested_at": "2026-09-24T12:00:00Z",
+      "data_quality": "synthetic"
+    }
+  ],
+  "census_honesty_note": "Population figures sourced from Census 2011 (last published) and NFHS-5 district estimates; India's next census is in progress as of 2026 and not yet released."
+}

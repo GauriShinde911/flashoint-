@@ -1,0 +1,98 @@
+[
+  {
+    "district_id": "IND-MH-PUN",
+    "district_name": "Pune",
+    "admin2": "Pune",
+    "admin1": "Maharashtra",
+    "sector": "healthcare",
+    "population": 9429408,
+    "facilities_count": 8,
+    "citizen_demand_count": 210,
+    "existing_investment_cr": 14.5,
+    "priority_score": 78.4,
+    "rank": 1,
+    "lat": 18.5204,
+    "lon": 73.8567,
+    "score_breakdown": {
+      "demand": {"raw": 210, "normalized_score": 70.0, "weight": 0.3},
+      "population": {"raw": 9429408, "normalized_score": 100.0, "weight": 0.25},
+      "infra_deficit": {"normalized_score": 60.0, "weight": 0.25},
+      "accessibility": {"normalized_score": 65.0, "weight": 0.1},
+      "inverse_investment": {"raw_cr": 14.5, "normalized_score": 42.0, "weight": 0.1}
+    },
+    "existing_project_status": "active_project_found",
+    "matching_projects": [
+      {
+        "project_id": "PROJ-COMP-002",
+        "name": "Haveli Clean Water Pipeline & Storage Tank",
+        "status": "Ongoing",
+        "budget_inr_cr": 6.8
+      }
+    ],
+    "data_quality": "real"
+  },
+  {
+    "district_id": "IND-MH-THA",
+    "district_name": "Thane",
+    "admin2": "Thane",
+    "admin1": "Maharashtra",
+    "sector": "healthcare",
+    "population": 11060148,
+    "facilities_count": 8,
+    "citizen_demand_count": 245,
+    "existing_investment_cr": 6.2,
+    "priority_score": 88.5,
+    "rank": 2,
+    "lat": 19.2403,
+    "lon": 73.1305,
+    "score_breakdown": {
+      "demand": {"raw": 245, "normalized_score": 81.67, "weight": 0.3},
+      "population": {"raw": 11060148, "normalized_score": 100.0, "weight": 0.25},
+      "infra_deficit": {"normalized_score": 75.0, "weight": 0.25},
+      "accessibility": {"normalized_score": 70.0, "weight": 0.1},
+      "inverse_investment": {"raw_cr": 6.2, "normalized_score": 75.2, "weight": 0.1}
+    },
+    "existing_project_status": "completed_project_found",
+    "matching_projects": [
+      {
+        "project_id": "PROJ-COMP-001",
+        "name": "Kalyan Sub-District Hospital & Emergency Block",
+        "status": "Completed",
+        "budget_inr_cr": 14.5
+      }
+    ],
+    "data_quality": "real"
+  },
+  {
+    "district_id": "IND-UP-VAR",
+    "district_name": "Varanasi",
+    "admin2": "Varanasi",
+    "admin1": "Uttar Pradesh",
+    "sector": "healthcare",
+    "population": 3676841,
+    "facilities_count": 8,
+    "citizen_demand_count": 95,
+    "existing_investment_cr": 22.0,
+    "priority_score": 58.2,
+    "rank": 3,
+    "lat": 25.3176,
+    "lon": 82.9739,
+    "score_breakdown": {
+      "demand": {"raw": 95, "normalized_score": 31.67, "weight": 0.3},
+      "population": {"raw": 3676841, "normalized_score": 100.0, "weight": 0.25},
+      "infra_deficit": {"normalized_score": 60.0, "weight": 0.25},
+      "accessibility": {"normalized_score": 50.0, "weight": 0.1},
+      "inverse_investment": {"raw_cr": 22.0, "normalized_score": 12.0, "weight": 0.1}
+    },
+    "existing_project_status": "completed_project_found",
+    "matching_projects": [
+      {
+        "project_id": "PROJ-COMP-003",
+        "name": "Pindra All-Weather Highway Link Road",
+        "status": "Completed",
+        "budget_inr_cr": 11.2
+      }
+    ],
+    "data_quality": "real"
+  }
+]

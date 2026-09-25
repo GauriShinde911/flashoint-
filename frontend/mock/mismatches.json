@@ -1,0 +1,20 @@
+[
+  {
+    "district": "Thane",
+    "admin1": "Maharashtra",
+    "mismatch_type": "UNDER_FUNDED_HIGH_DEMAND",
+    "investment_cr": 6.2,
+    "citizen_demand_count": 245,
+    "facilities_count": 8,
+    "description": "Critical demand (245 requests) and only 8 facilities, but existing investment is low at ₹6.2 Cr."
+  },
+  {
+    "district": "Varanasi",
+    "admin1": "Uttar Pradesh",
+    "mismatch_type": "OVER_FUNDED_LOW_DEMAND",
+    "investment_cr": 22.0,
+    "citizen_demand_count": 35,
+    "facilities_count": 8,
+    "description": "High investment (₹22.0 Cr) allocated, but citizen-reported demand is low (35 requests) with adequate facilities (8)."
+  }
+]

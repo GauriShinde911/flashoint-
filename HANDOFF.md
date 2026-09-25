@@ -10,10 +10,10 @@
 | **STEP 3** | Synthetic citizen requests (150–300 requests, en/hi/mr, time-spread) | **DONE** |
 | **STEP 4** | Scoring engine (deterministic, weights.json, District C>A>B test) | **DONE** |
 | **STEP 5** | Impact Measurement Engine (Pre vs Post completion comparison) | **DONE** |
-| **STEP 6** | Gemini understanding layer (ADK / pipeline, USE_MOCK_GEMINI) | TODO |
-| **STEP 7** | Gemini explanation layer + NL query (/explain, /query) | TODO |
-| **STEP 8** | Backend API completion (CORS, validation, endpoints, tests) | TODO |
-| **STEP 9** | Policymaker dashboard (Leaflet multi-region, Impact view, Voice input) | TODO |
+| **STEP 6** | Policymaker Dashboard (plain HTML+CSS+JS, Leaflet, 6 tabs, Voice, Offline fallback) | **DONE** |
+| **STEP 7** | Gemini understanding layer (ADK / pipeline, USE_MOCK_GEMINI) | TODO |
+| **STEP 8** | Gemini explanation layer + NL query (/explain, /query endpoints) | TODO |
+| **STEP 9** | Backend API completion (CORS, validation, endpoints, tests) | TODO |
 | **STEP 10** | Deploy config (render.yaml, Firebase Hosting, GitHub Actions) | TODO |
 | **STEP 11** | BRICS + DPG docs (ARCHITECTURE.md, README.md, honest census note) | TODO |
 | **STEP 12** | Submission docs (BRIEF_DESCRIPTION.md, DEMO_SCRIPT.md, PITCH_OUTLINE.md) | TODO |
@@ -92,5 +92,17 @@ uvicorn backend.app.main:app --reload --port 8000
 
 ---
 
+## What works in STEP 6 (Frontend Dashboard)
+- **Leaflet map** showing all 3 pilot districts (Pune, Thane, Varanasi) with colour-coded priority circles.
+- **6 tabs**: Ranked Recommendations, Silent Need Flags, Investment-Demand Mismatch, Impact Measurement, AI Command Center, Submit Request.
+- **Right evidence panel**: score ring, breakdown bar chart (SVG), stats, explanation, project status.
+- **Language switcher**: English / हिन्दी / मराठी via `i18n.js` dictionary.
+- **Offline Demo Mode**: falls back to `frontend/mock/*.json` when backend is unreachable.
+- **Voice input** via Web Speech API on Submit Request form (Chrome/Edge only).
+- **No build tooling**: pure HTML + CSS + vanilla JS, Leaflet via CDN.
+- To run: `python -m http.server 3000` inside `frontend/`.
+
+---
+
 ## NEXT STEP
-Proceed to **STEP 6 — Gemini understanding layer**. Build backend service (key server-side only) that does: language detection, category/urgency classification, location+entity extraction, semantic clustering of related requests. Structure as a clean pipeline supporting `USE_MOCK_GEMINI=true|false`. Endpoint: `POST /requests` (text in, structured demand out). Add unit tests.
+Proceed to **STEP 7 — Gemini understanding layer**. Build `backend/services/gemini_service.py` (key server-side only) that does: language detection, category/urgency classification, location+entity extraction, semantic clustering of related requests. Structure as a clean pipeline supporting `USE_MOCK_GEMINI=true|false`. Endpoint: `POST /requests` (text in, structured demand out). Add unit tests.

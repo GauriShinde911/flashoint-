@@ -1,0 +1,11 @@
+[
+  {
+    "district": "Varanasi",
+    "admin1": "Uttar Pradesh",
+    "population": 3676841,
+    "facilities_count": 8,
+    "citizen_demand_count": 35,
+    "silent_need_severity": 82.5,
+    "reason": "High population (3,676,841) with severe infrastructure deficit (8 facilities) but low citizen reporting (35 requests). Potential digital divide or reporting barrier."
+  }
+]

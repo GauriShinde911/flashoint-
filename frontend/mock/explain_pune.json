@@ -1,0 +1,12 @@
+{
+  "district": "Pune",
+  "priority_score": 78.4,
+  "explanation": "Pune (Maharashtra) is prioritized with a Priority Score of 78.4/100 because it combines a large affected population of 94.3 lakh, 8 healthcare facilities available against target, 210 citizen grievance reports, and ₹14.5 Cr in existing investment.",
+  "grounded_inputs": {
+    "population": 9429408,
+    "facilities_count": 8,
+    "citizen_demand_count": 210,
+    "existing_investment_cr": 14.5
+  },
+  "footnote": "Grounded strictly in verified Census 2011/NFHS-5, National Hospital Directory, and citizen reporting metrics without fabricated assertions."
+}

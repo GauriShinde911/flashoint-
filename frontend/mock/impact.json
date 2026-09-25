@@ -1,0 +1,42 @@
+[
+  {
+    "project_id": "PROJ-COMP-001",
+    "project_name": "Kalyan Sub-District Hospital & Emergency Block",
+    "sector": "healthcare",
+    "admin2": "Thane",
+    "completion_date": "2025-10-01",
+    "is_measurable": true,
+    "window_days": 180,
+    "window_periods": {
+      "pre_window": {"start": "2025-04-04", "end": "2025-10-01"},
+      "post_window": {"start": "2025-10-01", "end": "2026-03-30"}
+    },
+    "pre_completion_request_count": 48,
+    "post_completion_request_count": 12,
+    "volume_change": -36,
+    "percentage_change": -75.0,
+    "impact_summary": "Significant Demand Reduction (High Positive Impact)",
+    "data_quality": "synthetic",
+    "disclaimer": "based on available data, not a guarantee"
+  },
+  {
+    "project_id": "PROJ-COMP-002",
+    "project_name": "Haveli Clean Water Pipeline & Storage Tank",
+    "sector": "water_sanitation",
+    "admin2": "Pune",
+    "completion_date": "2025-11-15",
+    "is_measurable": true,
+    "window_days": 180,
+    "window_periods": {
+      "pre_window": {"start": "2025-05-19", "end": "2025-11-15"},
+      "post_window": {"start": "2025-11-15", "end": "2026-05-14"}
+    },
+    "pre_completion_request_count": 32,
+    "post_completion_request_count": 8,
+    "volume_change": -24,
+    "percentage_change": -75.0,
+    "impact_summary": "Significant Demand Reduction (High Positive Impact)",
+    "data_quality": "synthetic",
+    "disclaimer": "based on available data, not a guarantee"
+  }
+]

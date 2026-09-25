@@ -1,148 +1,183 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Development Priority Intelligence | Digital Public Good</title>
-  <!-- Google Fonts & Leaflet CSS -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Development Priority Intelligence — BRICS Digital Public Infrastructure</title>
+  <meta name="description" content="AI-powered multilingual platform to prioritize government development investments across districts — healthcare, water, roads, education. Track 1 BRICS Hackathon."/>
+
+  <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-  <link rel="stylesheet" href="css/style.css">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+
+  <!-- App CSS -->
+  <link rel="stylesheet" href="css/style.css"/>
 </head>
 <body>
-  <div class="app-container">
-    <!-- Top Navigation Header -->
-    <header class="top-nav">
-      <div class="nav-brand">
-        <div class="brand-logo">DPI</div>
-        <div class="brand-titles">
-          <h1>Development Priority Intelligence</h1>
-          <span class="sub-title">Track 1: AI for Digital Public Infrastructure & Governance (BRICS Innovation)</span>
-        </div>
-      </div>
-      <div class="nav-status">
-        <span class="badge badge-dpg">Digital Public Good</span>
-        <span class="badge badge-data-quality" id="global-data-badge">SYNTHETIC DEMO DATA</span>
-        <div class="country-pill">
-          <span class="flag">🇮🇳</span>
-          <span class="country-name">India (Generic Admin 0-3)</span>
-        </div>
-      </div>
-    </header>
 
-    <!-- Main Dashboard Grid -->
-    <main class="dashboard-grid">
-      <!-- Left Column: Geospatial & Analytics -->
-      <section class="panel map-panel">
-        <div class="panel-header">
-          <div class="header-info">
-            <h2>National & Multi-State Geospatial Intelligence</h2>
-            <p>Cross-state pilot analysis: Maharashtra (Pune, Thane) & Uttar Pradesh (Varanasi, Gorakhpur)</p>
-          </div>
-          <div class="filter-controls">
-            <select id="sector-filter" class="custom-select">
-              <option value="all">All Sectors</option>
-              <option value="healthcare" selected>Healthcare (Primary Slice)</option>
-              <option value="water_sanitation">Water & Sanitation (JJM)</option>
-              <option value="roads_transport">Roads & Connectivity (PMGSY)</option>
-            </select>
-          </div>
-        </div>
-        <div id="map-container" class="map-view"></div>
-        <div class="map-legend">
-          <div class="legend-item"><span class="legend-dot dot-critical"></span> High Priority (Score > 75)</div>
-          <div class="legend-item"><span class="legend-dot dot-moderate"></span> Moderate (Score 50-75)</div>
-          <div class="legend-item"><span class="legend-dot dot-low"></span> Funded / Adequate (Score < 50)</div>
-          <div class="legend-item"><span class="legend-dot dot-silent"></span> Silent Need Alert</div>
-        </div>
-      </section>
+  <!-- ===== TOP BAR ===== -->
+  <header class="topbar" role="banner">
+    <div class="topbar-brand">
+      <span class="topbar-title" data-i18n="app_title">Development Priority Intelligence</span>
+      <span class="topbar-tagline" data-i18n="app_tagline">Multilingual AI &amp; Deterministic Analytics Platform for DPI</span>
+    </div>
+    <div class="topbar-controls">
+      <span class="country-pill" aria-label="Country: India">🇮🇳 India</span>
+      <nav class="lang-switcher" aria-label="Language switcher">
+        <button class="lang-btn active" data-lang="en" aria-label="Switch to English">EN</button>
+        <button class="lang-btn" data-lang="hi" aria-label="हिन्दी में बदलें">हि</button>
+        <button class="lang-btn" data-lang="mr" aria-label="मराठीत बदला">मरा</button>
+      </nav>
+    </div>
+  </header>
 
-      <!-- Right Column: Priority Rankings & Grounded Explanations -->
-      <section class="panel ranking-panel">
-        <div class="panel-header">
-          <div class="header-info">
-            <h2>Explainable Priority Ranking</h2>
-            <p>Deterministic mathematical scoring + Gemini grounded justification</p>
-          </div>
-        </div>
-        <div class="rankings-list" id="rankings-container">
-          <div class="loading-state">Computing deterministic priorities...</div>
-        </div>
-      </section>
-
-      <!-- Bottom Wide Column: Project Impact Measurement Engine -->
-      <section class="panel impact-panel">
-        <div class="panel-header">
-          <div class="header-info">
-            <h2>Before-vs-After Project Impact Measurement Engine</h2>
-            <p>Auditing completed public projects to verify if taxpayer investments reduced citizen grievances</p>
-          </div>
-          <span class="badge badge-impact">Post-Commissioning Audit</span>
-        </div>
-        <div class="impact-table-wrapper">
-          <table class="impact-table">
-            <thead>
-              <tr>
-                <th>Project Name</th>
-                <th>District & State</th>
-                <th>Sector</th>
-                <th>Completion Date</th>
-                <th>Pre-Completion (6 Mo)</th>
-                <th>Post-Completion (6 Mo)</th>
-                <th>Measured Impact</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody id="impact-table-body">
-              <tr><td colspan="8" class="loading-state">Loading impact verification metrics...</td></tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="impact-disclaimer">
-          * Disclosure: Measured impact is computed from temporal complaint volume deltas relative to project commissioning timestamps; based on available reporting data.
-        </div>
-      </section>
-
-      <!-- Bottom Panel 2: Multilingual Citizen Request Simulator -->
-      <section class="panel simulator-panel">
-        <div class="panel-header">
-          <div class="header-info">
-            <h2>Citizen Multilingual Ingestion Gateway</h2>
-            <p>Capture voice/text in Hindi, Marathi, or English; normalize intent via Gemini ADK</p>
-          </div>
-        </div>
-        <div class="simulator-layout">
-          <div class="sim-input-box">
-            <div class="input-controls">
-              <button id="voice-btn" class="btn btn-voice">
-                <span class="mic-icon">🎙️</span> <span id="voice-text">Record Voice</span>
-              </button>
-              <select id="sim-region" class="custom-select">
-                <option value="Pune">Pune (Maharashtra)</option>
-                <option value="Thane">Thane (Maharashtra)</option>
-                <option value="Gorakhpur">Gorakhpur (Uttar Pradesh)</option>
-                <option value="Varanasi">Varanasi (Uttar Pradesh)</option>
-              </select>
-            </div>
-            <textarea id="request-input" placeholder="Type or speak a development grievance in English, Hindi (हिन्दी), or Marathi (मराठी)... e.g., 'आमच्या गावात प्राथमिक आरोग्य केंद्र नाही.'"></textarea>
-            <button id="submit-request-btn" class="btn btn-primary">Process & Normalize Request</button>
-          </div>
-          <div class="sim-output-box" id="sim-output">
-            <div class="output-placeholder">Gemini Agent Classification and Entity Extraction will appear here.</div>
-          </div>
-        </div>
-      </section>
-    </main>
-
-    <footer class="app-footer">
-      <p>Development Priority Intelligence — Digital Public Good under MIT License. Reusable for BRICS partners.</p>
-    </footer>
+  <!-- Offline notice -->
+  <div id="offline-notice" role="status" aria-live="polite">
+    ⚠️ <span data-i18n="offline_notice">Offline Demo Mode — Connected to local static mock data.</span>
   </div>
 
-  <!-- Scripts -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <!-- ===== MAIN LAYOUT ===== -->
+  <div class="main-layout">
+
+    <!-- Left Sidebar: Filters -->
+    <aside class="sidebar" role="complementary" aria-label="Filters">
+      <h3>Filters</h3>
+
+      <div class="filter-group">
+        <label for="filter-state" data-i18n="filter_state">State</label>
+        <select id="filter-state" aria-label="Filter by state">
+          <option value="all" data-i18n="all_states">All States</option>
+          <option value="Maharashtra">Maharashtra</option>
+          <option value="Uttar Pradesh">Uttar Pradesh</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="filter-sector" data-i18n="filter_sector">Sector</label>
+        <select id="filter-sector" aria-label="Filter by sector">
+          <option value="all">All Sectors</option>
+          <option value="healthcare" selected>Healthcare</option>
+          <option value="water_sanitation" disabled>Water &amp; Sanitation (coming)</option>
+          <option value="roads_transport" disabled>Roads &amp; Transport (coming)</option>
+          <option value="education" disabled>Education (coming)</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="filter-quality" data-i18n="filter_quality">Data Quality</label>
+        <select id="filter-quality" aria-label="Filter by data quality">
+          <option value="all" data-i18n="all_qualities">All (Real + Synthetic)</option>
+          <option value="real" data-i18n="real_only">Real Data Only</option>
+          <option value="synthetic" data-i18n="synthetic_only">Synthetic Only</option>
+        </select>
+      </div>
+    </aside>
+
+    <!-- Center: Map + Tabs -->
+    <main class="center-panel" role="main">
+
+      <!-- Leaflet Map -->
+      <div id="leaflet-map" aria-label="Pilot district priority map — Pune, Thane, Varanasi"></div>
+
+      <!-- Tab Bar -->
+      <nav class="tabs-bar" role="tablist" aria-label="Dashboard views">
+        <button class="tab-btn" data-tab="ranked" role="tab" aria-selected="false" aria-controls="tab-ranked-panel" id="tab-btn-ranked">
+          📊 <span data-i18n="tab_ranked">Ranked Recommendations</span>
+        </button>
+        <button class="tab-btn" data-tab="silent" role="tab" aria-selected="false" aria-controls="tab-silent-panel" id="tab-btn-silent">
+          🔇 <span data-i18n="tab_silent">Silent Need Flags</span>
+        </button>
+        <button class="tab-btn" data-tab="mismatch" role="tab" aria-selected="false" aria-controls="tab-mismatch-panel" id="tab-btn-mismatch">
+          ⚖️ <span data-i18n="tab_mismatch">Investment–Demand Mismatch</span>
+        </button>
+        <button class="tab-btn" data-tab="impact" role="tab" aria-selected="false" aria-controls="tab-impact-panel" id="tab-btn-impact">
+          📈 <span data-i18n="tab_impact">Impact Measurement</span>
+        </button>
+        <button class="tab-btn" data-tab="command" role="tab" aria-selected="false" aria-controls="tab-command-panel" id="tab-btn-command">
+          🤖 <span data-i18n="tab_command">AI Command Center</span>
+        </button>
+        <button class="tab-btn" data-tab="submit" role="tab" aria-selected="false" aria-controls="tab-submit-panel" id="tab-btn-submit">
+          📝 <span data-i18n="tab_submit">Submit Request</span>
+        </button>
+      </nav>
+
+      <!-- Tab Content Panels -->
+      <div class="tab-panels">
+        <div id="tab-ranked-panel" class="tab-panel" role="tabpanel" aria-labelledby="tab-btn-ranked">
+          <div id="tab-ranked-content">
+            <div class="loading-state">⏳ Loading district rankings...</div>
+          </div>
+        </div>
+
+        <div id="tab-silent-panel" class="tab-panel" role="tabpanel" aria-labelledby="tab-btn-silent">
+          <div id="tab-silent-content">
+            <div class="loading-state">⏳ Detecting silent needs...</div>
+          </div>
+        </div>
+
+        <div id="tab-mismatch-panel" class="tab-panel" role="tabpanel" aria-labelledby="tab-btn-mismatch">
+          <div id="tab-mismatch-content">
+            <div class="loading-state">⏳ Analysing investment mismatches...</div>
+          </div>
+        </div>
+
+        <div id="tab-impact-panel" class="tab-panel" role="tabpanel" aria-labelledby="tab-btn-impact">
+          <div id="tab-impact-content">
+            <div class="loading-state">⏳ Loading impact measurements...</div>
+          </div>
+        </div>
+
+        <div id="tab-command-panel" class="tab-panel" role="tabpanel" aria-labelledby="tab-btn-command">
+          <div id="tab-command-content">
+            <div class="loading-state">⏳ Initialising AI command center...</div>
+          </div>
+        </div>
+
+        <div id="tab-submit-panel" class="tab-panel" role="tabpanel" aria-labelledby="tab-btn-submit">
+          <div id="tab-submit-content">
+            <div class="loading-state">⏳ Loading citizen request form...</div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- Right: Evidence Panel -->
+    <aside class="evidence-panel" role="complementary" aria-label="District evidence panel">
+      <div id="evidence-panel">
+        <div class="panel-empty-state">
+          <div class="empty-icon">🗺️</div>
+          <p>Click a district on the map to view the full evidence panel.</p>
+        </div>
+      </div>
+    </aside>
+
+  </div><!-- /.main-layout -->
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="app-footer" role="contentinfo">
+    <div id="datasets-footer">
+      <div class="loading-state">⏳ Loading dataset information...</div>
+    </div>
+  </footer>
+
+  <!-- ===== SCRIPTS ===== -->
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV/XN/WPeM=" crossorigin=""></script>
+
+  <!-- App Scripts in dependency order -->
+  <script src="config.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/map.js"></script>
+  <script src="js/voice.js"></script>
+  <script src="js/panels.js"></script>
   <script src="js/app.js"></script>
+
 </body>
 </html>
