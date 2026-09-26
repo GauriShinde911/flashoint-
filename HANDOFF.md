@@ -11,7 +11,7 @@
 | **STEP 4** | Scoring engine (deterministic, weights.json, District C>A>B test) | **DONE** |
 | **STEP 5** | Impact Measurement Engine (Pre vs Post completion comparison) | **DONE** |
 | **STEP 6** | Policymaker Dashboard (plain HTML+CSS+JS, Leaflet, 6 tabs, Voice, Offline fallback) | **DONE** |
-| **STEP 7** | Gemini understanding layer (ADK / pipeline, USE_MOCK_GEMINI) | TODO |
+| **STEP 7** | Gemini understanding layer (ADK / pipeline, USE_MOCK_GEMINI) | **DONE** |
 | **STEP 8** | Gemini explanation layer + NL query (/explain, /query endpoints) | TODO |
 | **STEP 9** | Backend API completion (CORS, validation, endpoints, tests) | TODO |
 | **STEP 10** | Deploy config (render.yaml, Firebase Hosting, GitHub Actions) | TODO |
@@ -79,10 +79,20 @@ uvicorn backend.app.main:app --reload --port 8000
   - Compares citizen request volume in equal time windows (e.g. 90/180 days) BEFORE vs AFTER project completion dates.
   - Seeded 3 completed government projects (`data/synthetic/completed_projects.json`) with before/after request timestamps demonstrating demand reduction.
   - Includes mandatory disclaimer: `"based on available data, not a guarantee"`.
-- **Tests**: 17/17 tests passing (`test_health.py`, `test_storage.py`, `test_ingest.py`, `test_synthetic_requests.py`, `test_worked_example.py`, `test_impact_engine.py`).
+- **Tests**: 68/70 tests passing across all test modules. The 2 pre-existing integration tests (`test_ingestion_storage_state`, `test_storage_synthetic_requests`) require running `python scripts/ingest.py` to seed the SQLite DB first — they pass after seeding.
+- **Gemini Understanding Layer (STEP 7)**:
+  - Restructured `backend/services/gemini_service.py` as a clean 4-stage pipeline:
+    - Stage 1: Language detection (en/hi/mr via Devanagari heuristics)
+    - Stage 2: Category/urgency classification (healthcare, water_sanitation, roads_transport, education; critical urgency bump on emergency words)
+    - Stage 3: Location + entity extraction (3 pilot districts, BRICS-generic admin hierarchy)
+    - Stage 4: Semantic cluster ID generation (CLUSTER-{CAT}-{DISTRICT})
+  - `USE_MOCK_GEMINI=true` → fully deterministic offline path, no API key needed
+  - `USE_MOCK_GEMINI=false` → live Gemini 1.5-flash with graceful deterministic fallback
+  - Gemini API key held server-side only; never exposed to browser
+  - 44 new unit tests added in `tests/test_gemini_service.py`; all pass offline
 
 ## Known Gaps
-- Gemini understanding layer pipeline (`backend/services/gemini_service.py`) performing language detection, category/urgency classification, location/entity extraction, and semantic clustering with `USE_MOCK_GEMINI` support to be implemented in STEP 6.
+- `POST /requests` uses a simple district heuristic for location extraction. In STEP 8, the Gemini explanation layer (`/explain`) will be upgraded with a proper live Gemini rewrite prompt and the NL query parser (`/query`) will support broader state/sector combinations beyond the 3 pilot districts.
 
 ---
 
@@ -105,4 +115,4 @@ uvicorn backend.app.main:app --reload --port 8000
 ---
 
 ## NEXT STEP
-Proceed to **STEP 7 — Gemini understanding layer**. Build `backend/services/gemini_service.py` (key server-side only) that does: language detection, category/urgency classification, location+entity extraction, semantic clustering of related requests. Structure as a clean pipeline supporting `USE_MOCK_GEMINI=true|false`. Endpoint: `POST /requests` (text in, structured demand out). Add unit tests.
+Proceed to **STEP 8 — Gemini explanation layer + NL query endpoints**. Upgrade `generate_grounded_explanation` to use a richer Gemini prompt that cites actual numbers (population, demand, investment) in the generated text and is testable with mock. Upgrade `parse_natural_language_query` to support compound queries (multi-sector, multi-district) and add backend-side filter execution validation. Endpoints: `GET /explain/{district_name}` and `POST /query`. Add unit + integration tests. Target: all 70/70 tests passing after running ingest.py.
