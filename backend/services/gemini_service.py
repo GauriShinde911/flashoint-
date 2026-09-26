@@ -28,10 +28,28 @@ import re
 from typing import Dict, Any, Optional
 
 # ---------------------------------------------------------------------------
-# Environment flags — read once at import time
+# Dynamic environment flags — evaluated at call-time for seamless testing & runtime switching
 # ---------------------------------------------------------------------------
-USE_MOCK_GEMINI: bool = os.getenv("USE_MOCK_GEMINI", "true").lower() in ("true", "1", "yes")
-GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
+def _is_mock_mode() -> bool:
+    return os.getenv("USE_MOCK_GEMINI", "true").lower() in ("true", "1", "yes")
+
+def _get_api_key() -> str:
+    return os.getenv("GEMINI_API_KEY", "").strip()
+
+def _get_model_name() -> str:
+    return os.getenv("GEMINI_MODEL_NAME", "gemini-flash-latest").strip()
+
+def _can_use_gemini() -> bool:
+    return (not _is_mock_mode()) and bool(_get_api_key())
+
+def __getattr__(name: str) -> Any:
+    if name == "USE_MOCK_GEMINI":
+        return _is_mock_mode()
+    if name == "GEMINI_API_KEY":
+        return _get_api_key()
+    if name == "GEMINI_MODEL_NAME":
+        return _get_model_name()
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 # Known pilot districts (expand in config for multi-country BRICS support)
 _PILOT_DISTRICTS: Dict[str, str] = {
@@ -184,8 +202,8 @@ def _call_gemini(text: str) -> Optional[Dict[str, Any]]:
     """
     try:
         import google.generativeai as genai  # type: ignore
-        genai.configure(api_key=GEMINI_API_KEY)
-        model = genai.GenerativeModel("gemini-1.5-flash")
+        genai.configure(api_key=_get_api_key())
+        model = genai.GenerativeModel(_get_model_name())
         prompt = _GEMINI_PROMPT_TEMPLATE.format(text=text.replace('"', "'"))
         response = model.generate_content(prompt)
         raw = response.text.strip()
@@ -218,7 +236,7 @@ def understand_citizen_request(
 
     Returns a structured dict ready to be stored as a CitizenRequest record.
     """
-    mode = "mock_gemini" if (USE_MOCK_GEMINI or not GEMINI_API_KEY) else "live_gemini"
+    mode = "live_gemini" if _can_use_gemini() else "mock_gemini"
 
     # --- Stage 1: Language detection (always deterministic as baseline) ---
     detected_language = _stage1_detect_language(raw_text)
@@ -238,7 +256,7 @@ def understand_citizen_request(
 
     # --- Live Gemini override (when enabled and key available) ---
     gemini_result: Optional[Dict[str, Any]] = None
-    if not USE_MOCK_GEMINI and GEMINI_API_KEY:
+    if _can_use_gemini():
         gemini_result = _call_gemini(raw_text)
 
     if gemini_result:
@@ -315,7 +333,10 @@ def generate_grounded_explanation(
     Gemini rephrases the deterministic text; it NEVER invents numbers.
     """
     pop = district_info.get("population", 0)
-    pop_str = f"{round(pop / 100_000.0, 1)} lakh"
+    if isinstance(pop, (int, float)):
+        pop_str = f"{round(pop / 100_000.0, 1)} lakh"
+    else:
+        pop_str = str(pop)
     facilities = district_info.get("facilities_count", 0)
     demand = district_info.get("citizen_demand_count", 0)
     inv_cr = district_info.get("existing_investment_cr", 0.0)
@@ -331,11 +352,11 @@ def generate_grounded_explanation(
     explanation_mode = "deterministic"
 
     # Live Gemini rephrase (never changes numbers; only improves prose)
-    if not USE_MOCK_GEMINI and GEMINI_API_KEY:
+    if _can_use_gemini():
         try:
             import google.generativeai as genai  # type: ignore
-            genai.configure(api_key=GEMINI_API_KEY)
-            model = genai.GenerativeModel("gemini-1.5-flash")
+            genai.configure(api_key=_get_api_key())
+            model = genai.GenerativeModel(_get_model_name())
             prompt = _EXPLAIN_PROMPT_TEMPLATE.format(text=explanation_text)
             resp = model.generate_content(prompt)
             rephrased = resp.text.strip()
@@ -468,11 +489,11 @@ def parse_natural_language_query(query: str) -> Dict[str, Any]:
     structured_filter = _parse_nl_query_deterministic(query)
 
     # Live Gemini override (merges into deterministic baseline)
-    if not USE_MOCK_GEMINI and GEMINI_API_KEY:
+    if _can_use_gemini():
         try:
             import google.generativeai as genai  # type: ignore
-            genai.configure(api_key=GEMINI_API_KEY)
-            model = genai.GenerativeModel("gemini-1.5-flash")
+            genai.configure(api_key=_get_api_key())
+            model = genai.GenerativeModel(_get_model_name())
             prompt = _NL_QUERY_PROMPT.format(query=query.replace('"', "'"))
             resp = model.generate_content(prompt)
             raw = resp.text.strip()
@@ -564,11 +585,11 @@ def analyze_infrastructure_photo(
         "verified_at": "2026-09-26T07:50:00Z"
     }
 
-    if not USE_MOCK_GEMINI and GEMINI_API_KEY:
+    if _can_use_gemini():
         try:
             import google.generativeai as genai  # type: ignore
-            genai.configure(api_key=GEMINI_API_KEY)
-            model = genai.GenerativeModel("gemini-1.5-flash")
+            genai.configure(api_key=_get_api_key())
+            model = genai.GenerativeModel(_get_model_name())
 
             image_bytes = base64.b64decode(cleaned_b64)
             image_part = {
