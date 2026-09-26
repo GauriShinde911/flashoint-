@@ -1,6 +1,6 @@
 from typing import Optional, List, Dict, Any
 from pydantic import BaseModel, Field
-from datetime import datetime
+from datetime import datetime, timezone
 
 class AdminHierarchy(BaseModel):
     country_code: str = "IND"
@@ -20,7 +20,8 @@ class CitizenRequestInput(BaseModel):
 
 class CitizenRequestRecord(BaseModel):
     id: str
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
     raw_text: str
     translated_text: str
     source_channel: str

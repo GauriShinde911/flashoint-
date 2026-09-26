@@ -12,7 +12,7 @@ import json
 import os
 import random
 import uuid
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 PILOT_REGIONS = [
     {"country_code": "IND", "admin1": "Maharashtra", "admin2": "Pune", "admin3": "Haveli", "lat": 18.5204, "lon": 73.8567},
@@ -83,7 +83,7 @@ REQUEST_TEMPLATES = [
 def generate_synthetic_dataset(count: int = 220, output_path: str = "data/synthetic/citizen_requests.json"):
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     records = []
-    base_time = datetime.utcnow()
+    base_time = datetime.now(timezone.utc)
 
     for i in range(count):
         template = random.choice(REQUEST_TEMPLATES)
@@ -91,7 +91,7 @@ def generate_synthetic_dataset(count: int = 220, output_path: str = "data/synthe
         region = random.choice(PILOT_REGIONS)
         channel = random.choice(CHANNELS)
         days_ago = random.randint(5, 450)
-        timestamp = (base_time - timedelta(days=days_ago, hours=random.randint(0, 23), minutes=random.randint(0, 59))).isoformat() + "Z"
+        timestamp = (base_time - timedelta(days=days_ago, hours=random.randint(0, 23), minutes=random.randint(0, 59))).strftime("%Y-%m-%dT%H:%M:%SZ")
 
         record = {
             "id": f"REQ-SYNTH-{str(uuid.uuid4())[:8].upper()}",

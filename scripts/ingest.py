@@ -6,7 +6,7 @@ normalizes into open schemas, and records dataset version metadata.
 
 import os
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 
 # Add project root to sys.path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -20,7 +20,8 @@ from backend.app.loaders.projects_loader import load_government_projects
 
 def run_ingestion():
     store = get_storage()
-    now_iso = datetime.utcnow().isoformat() + "Z"
+    now_iso = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
 
     print("==========================================================")
     print("STARTING DATA INGESTION PIPELINE (Healthcare Slice & Citizen Demand)")

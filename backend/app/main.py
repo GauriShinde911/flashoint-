@@ -1,11 +1,11 @@
 import os
 import json
 import uuid
-from datetime import datetime
-from typing import List, Optional, Dict, Any
-from fastapi import FastAPI, HTTPException, Query, Body
+from datetime import datetime, timezone
+from typing import List, Optional, Dict, Any, Literal
+from fastapi import FastAPI, HTTPException, Query, Body, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from backend.app.config import settings
 from backend.app.storage import get_storage
@@ -28,11 +28,23 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=settings.cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Request Models with Strict Pydantic Validation
+class SubmitRequestModel(BaseModel):
+    raw_text: str = Field(..., min_length=1, max_length=2000, description="Raw text of citizen request")
+    source_channel: Optional[Literal["voice", "text", "messaging_app"]] = Field(
+        default="text", description="Channel through which request was submitted"
+    )
+    detected_language: Optional[str] = Field(default=None, max_length=10)
+    district: Optional[str] = Field(default="Pune", max_length=100)
+
+class QueryModel(BaseModel):
+    query: str = Field(..., min_length=1, max_length=500, description="Natural language search query")
 
 # Helper to aggregate district metrics from storage
 def get_district_aggregates():
@@ -103,18 +115,11 @@ def get_district_aggregates():
 
     return aggregated
 
-# Request Models
-class SubmitRequestModel(BaseModel):
-    raw_text: str
-    source_channel: Optional[str] = "text"
-    detected_language: Optional[str] = None
-    district: Optional[str] = "Pune"
+# Modular API Router
+api_router = APIRouter()
 
-class QueryModel(BaseModel):
-    query: str
-
-@app.get("/health")
-@app.get("/api/health")
+@api_router.get("/health")
+@api_router.get("/api/health")
 def health_check():
     return {
         "status": "online",
@@ -124,16 +129,14 @@ def health_check():
         "country": settings.default_country
     }
 
-@app.get("/districts")
-@app.get("/api/v1/districts")
+@api_router.get("/districts")
 def get_ranked_districts(sector: Optional[str] = None, data_quality: Optional[str] = None):
     districts = get_district_aggregates()
     if data_quality and data_quality != "all":
         districts = [d for d in districts if d.get("data_quality") == data_quality]
     return districts
 
-@app.get("/districts/{district_id}")
-@app.get("/api/v1/districts/{district_id}")
+@api_router.get("/districts/{district_id}")
 def get_district_detail(district_id: str):
     districts = get_district_aggregates()
     for d in districts:
@@ -141,8 +144,7 @@ def get_district_detail(district_id: str):
             return d
     raise HTTPException(status_code=404, detail="District not found")
 
-@app.get("/explain/{district_name}")
-@app.get("/api/v1/explain/{district_name}")
+@api_router.get("/explain/{district_name}")
 def explain_district(district_name: str):
     districts = get_district_aggregates()
     for d in districts:
@@ -151,8 +153,7 @@ def explain_district(district_name: str):
             return generate_grounded_explanation(d["district_name"], d, score_info)
     raise HTTPException(status_code=404, detail="District not found for explanation")
 
-@app.post("/requests")
-@app.post("/api/v1/requests")
+@api_router.post("/requests")
 def submit_citizen_request(req_data: SubmitRequestModel):
     store = get_storage()
     understanding = understand_citizen_request(
@@ -163,7 +164,7 @@ def submit_citizen_request(req_data: SubmitRequestModel):
     district_name = req_data.district or understanding["admin_hierarchy"]["admin2"]
     state_name = "Maharashtra" if district_name in ["Pune", "Thane"] else "Uttar Pradesh"
 
-    now_iso = datetime.utcnow().isoformat() + "Z"
+    now_iso = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     record = {
         "id": f"REQ-SYNTH-{str(uuid.uuid4())[:8].upper()}",
         "timestamp": now_iso,
@@ -195,14 +196,12 @@ def submit_citizen_request(req_data: SubmitRequestModel):
         "record": record
     }
 
-@app.get("/requests")
-@app.get("/api/v1/requests")
+@api_router.get("/requests")
 def list_citizen_requests(limit: int = 100, category: Optional[str] = None, admin2: Optional[str] = None):
     store = get_storage()
     return store.get_citizen_requests(limit=limit, category=category, admin2=admin2)
 
-@app.post("/query")
-@app.post("/api/v1/query")
+@api_router.post("/query")
 def natural_language_query(query_data: QueryModel):
     parsed = parse_natural_language_query(query_data.query)
     districts = get_district_aggregates()
@@ -249,20 +248,17 @@ def natural_language_query(query_data: QueryModel):
         "results": results
     }
 
-@app.get("/silent-needs")
-@app.get("/api/v1/silent-needs")
+@api_router.get("/silent-needs")
 def get_silent_needs():
     districts = get_district_aggregates()
     return detect_silent_needs(districts)
 
-@app.get("/mismatches")
-@app.get("/api/v1/mismatches")
+@api_router.get("/mismatches")
 def get_mismatches():
     districts = get_district_aggregates()
     return detect_investment_mismatches(districts)
 
-@app.get("/impact")
-@app.get("/api/v1/impact")
+@api_router.get("/impact")
 def get_impact():
     store = get_storage()
     projects = store.get_government_projects()
@@ -274,8 +270,7 @@ def get_impact():
         results.append(imp)
     return results
 
-@app.get("/datasets")
-@app.get("/api/v1/datasets")
+@api_router.get("/datasets")
 def get_dataset_metadata():
     store = get_storage()
     versions = store.get_dataset_versions()
@@ -283,3 +278,7 @@ def get_dataset_metadata():
         "datasets": versions,
         "census_honesty_note": "Population figures sourced from Census 2011 (last published) and NFHS-5 district estimates; India's next census is in progress as of 2026 and not yet released."
     }
+
+# Include router for both /api/v1 prefix and legacy root prefix
+app.include_router(api_router, prefix="/api/v1", tags=["v1"])
+app.include_router(api_router, prefix="", tags=["legacy"])
