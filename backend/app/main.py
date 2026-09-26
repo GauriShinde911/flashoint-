@@ -17,7 +17,8 @@ from backend.engine.impact_engine import measure_project_impact
 from backend.services.gemini_service import (
     understand_citizen_request,
     generate_grounded_explanation,
-    parse_natural_language_query
+    parse_natural_language_query,
+    analyze_infrastructure_photo
 )
 
 app = FastAPI(
@@ -45,6 +46,12 @@ class SubmitRequestModel(BaseModel):
 
 class QueryModel(BaseModel):
     query: str = Field(..., min_length=1, max_length=500, description="Natural language search query")
+
+class AnalyzePhotoModel(BaseModel):
+    image_base64: str = Field(..., min_length=10, description="Base64 encoded photo")
+    mime_type: Optional[str] = Field(default="image/jpeg", max_length=50)
+    text_context: Optional[str] = Field(default=None, max_length=1000)
+    district: Optional[str] = Field(default="Pune", max_length=100)
 
 # Helper to aggregate district metrics from storage
 def get_district_aggregates():
@@ -279,6 +286,21 @@ def get_dataset_metadata():
         "census_honesty_note": "Population figures sourced from Census 2011 (last published) and NFHS-5 district estimates; India's next census is in progress as of 2026 and not yet released."
     }
 
+@api_router.post("/analyze-photo")
+def analyze_photo_endpoint(payload: AnalyzePhotoModel):
+    """
+    Evaluates citizen photo evidence using Gemini 1.5 Flash multimodal vision.
+    Returns damage detection, category tag, severity score, and visual evidence summary.
+    """
+    result = analyze_infrastructure_photo(
+        image_base64=payload.image_base64,
+        mime_type=payload.mime_type or "image/jpeg",
+        text_context=payload.text_context,
+        district=payload.district or "Pune"
+    )
+    return result
+
 # Include router for both /api/v1 prefix and legacy root prefix
 app.include_router(api_router, prefix="/api/v1", tags=["v1"])
 app.include_router(api_router, prefix="", tags=["legacy"])
+

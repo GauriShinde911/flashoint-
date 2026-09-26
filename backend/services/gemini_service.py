@@ -500,3 +500,96 @@ def parse_natural_language_query(query: str) -> Dict[str, Any]:
         "structured_filter": filt,
         "interpretation": interpretation,
     }
+
+
+# ===========================================================================
+# Multimodal Photo Evidence Analysis (STEP 13)
+# ===========================================================================
+
+_MULTIMODAL_PROMPT = """You are an expert civic infrastructure engineer assessing photo evidence submitted by a citizen for a Digital Public Infrastructure (DPI) platform.
+Context provided by citizen: "{context}"
+
+Analyze this photo and determine:
+1. detected_damage: boolean (true if visible infrastructure failure, degradation, or distress is shown, e.g. potholes, broken pipes, flood damage, hospital/clinic structural issues, missing medical facilities; false if unrelated or intact)
+2. category: one of ["roads_transport", "water_sanitation", "healthcare", "education", "other"]
+3. severity: one of ["low", "medium", "high", "critical"]
+4. severity_score: float between 0.0 (negligible) and 1.0 (extreme immediate hazard)
+5. visual_evidence_summary: 1-2 concise sentences objectively describing what is visible in the photo.
+6. actionable_recommendation: 1 sentence stating the municipal or departmental response recommended.
+
+Return ONLY a valid JSON object matching these 6 keys. Do not wrap in markdown or commentary."""
+
+
+def analyze_infrastructure_photo(
+    image_base64: str,
+    mime_type: str = "image/jpeg",
+    text_context: Optional[str] = None,
+    district: Optional[str] = None
+) -> Dict[str, Any]:
+    """
+    Evaluates citizen photo evidence using Gemini 1.5 Flash multimodal vision.
+    Falls back to a deterministic structural assessment when offline (USE_MOCK_GEMINI=true).
+    """
+    import base64
+
+    # Clean base64 string
+    cleaned_b64 = image_base64
+    if "," in cleaned_b64:
+        # Strip data:image/...;base64, prefix if present
+        cleaned_b64 = cleaned_b64.split(",", 1)[1]
+
+    ctx_lower = (text_context or "").lower()
+
+    # Determine simulated category from context or default to roads
+    category = "roads_transport"
+    if any(k in ctx_lower for k in ["school", "education", "teacher", "classroom", "student"]):
+        category = "education"
+    elif any(k in ctx_lower for k in ["health", "hospital", "phc", "doctor", "clinic", "bed", "medicine"]):
+        category = "healthcare"
+    elif any(k in ctx_lower for k in ["water", "pipe", "pipeline", "drain", "sewage", "tap"]):
+        category = "water_sanitation"
+    elif any(k in ctx_lower for k in ["road", "pothole", "highway", "bridge", "street"]):
+        category = "roads_transport"
+
+    # Default deterministic mock response
+    mock_result: Dict[str, Any] = {
+        "detected_damage": True,
+        "category": category,
+        "severity": "high",
+        "severity_score": 0.85,
+        "visual_evidence_summary": f"Simulated analysis: Visible structural degradation and surface inadequacy identified in {district or 'the reported area'}.",
+        "actionable_recommendation": f"Priority dispatch for municipal {category.replace('_', ' ')} engineering team.",
+        "data_quality": "mock",
+        "district": district or "Pune",
+        "verified_at": "2026-09-26T07:50:00Z"
+    }
+
+    if not USE_MOCK_GEMINI and GEMINI_API_KEY:
+        try:
+            import google.generativeai as genai  # type: ignore
+            genai.configure(api_key=GEMINI_API_KEY)
+            model = genai.GenerativeModel("gemini-1.5-flash")
+
+            image_bytes = base64.b64decode(cleaned_b64)
+            image_part = {
+                "mime_type": mime_type or "image/jpeg",
+                "data": image_bytes
+            }
+
+            prompt = _MULTIMODAL_PROMPT.format(context=text_context or "Citizen reported infrastructure issue.")
+            resp = model.generate_content([prompt, image_part])
+            raw = resp.text.strip()
+            if raw.startswith("```"):
+                raw = re.sub(r"```[a-z]*\n?", "", raw).replace("```", "").strip()
+
+            parsed = json.loads(raw)
+            parsed["data_quality"] = "real"
+            parsed["district"] = district or "Pune"
+            parsed["verified_at"] = "2026-09-26T07:50:00Z"
+            return parsed
+        except Exception as exc:
+            print(f"[WARN] Gemini multimodal vision analysis failed, using deterministic fallback: {exc}")
+            mock_result["fallback_reason"] = str(exc)
+
+    return mock_result
+

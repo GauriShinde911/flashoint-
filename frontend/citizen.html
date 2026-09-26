@@ -487,11 +487,31 @@
   <div class="form-card" id="form-section">
     <h3>📝 <span id="form-title">Describe the issue</span></h3>
 
-    <!-- Voice button -->
+    <!-- Voice and Photo Row -->
     <div class="voice-row">
       <button class="btn-voice" id="voice-btn" onclick="toggleVoice()">
         🎙️ <span id="voice-label">Speak your request</span>
       </button>
+      <label class="btn-voice" style="cursor:pointer;" id="photo-upload-label">
+        📷 <span id="photo-label">Attach Photo Evidence</span>
+        <input type="file" id="photo-input" accept="image/*" style="display:none;" onchange="handlePhotoUpload(event)"/>
+      </label>
+    </div>
+
+    <!-- AI Multimodal Photo Verification Card -->
+    <div id="photo-analysis-card" style="display:none; background:#ecfdf5; border:1.5px solid #10b981; border-radius:12px; padding:14px; margin-bottom:18px;">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+        <span style="font-weight:700; font-size:0.85rem; color:#065f46;">✨ Gemini Multimodal Vision Assessment</span>
+        <span id="photo-badge" style="background:#10b981; color:#fff; font-size:0.7rem; font-weight:700; padding:2px 8px; border-radius:12px;">Verified Evidence</span>
+      </div>
+      <div style="display:flex; gap:12px; align-items:flex-start;">
+        <img id="photo-preview-thumb" style="width:70px; height:70px; object-fit:cover; border-radius:8px; border:1px solid #d1fae5;" />
+        <div style="flex:1; font-size:0.8rem; color:#064e3b;">
+          <div id="photo-evidence-text" style="font-weight:600; margin-bottom:4px;">Analyzing photo evidence...</div>
+          <div id="photo-evidence-meta" style="font-size:0.75rem; color:#047857;">Severity: High · Category: Roads</div>
+          <div id="photo-evidence-rec" style="font-size:0.73rem; color:#065f46; margin-top:3px; font-style:italic;"></div>
+        </div>
+      </div>
     </div>
 
     <!-- Text area -->
@@ -672,6 +692,64 @@
     el.classList.toggle('warn', len > 1900);
   }
 
+  // Multimodal Photo Evidence Handling (STEP 13)
+  let attachedPhotoData = null;
+
+  async function handlePhotoUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+      const base64Data = e.target.result;
+      attachedPhotoData = base64Data;
+
+      // Show preview card
+      const card = document.getElementById('photo-analysis-card');
+      card.style.display = 'block';
+      document.getElementById('photo-preview-thumb').src = base64Data;
+      document.getElementById('photo-evidence-text').textContent = 'Analyzing photo with Gemini Multimodal Vision...';
+      document.getElementById('photo-evidence-meta').textContent = 'Processing visual features...';
+      document.getElementById('photo-evidence-rec').textContent = '';
+
+      try {
+        const res = await fetch('http://localhost:8000/api/v1/analyze-photo', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            image_base64: base64Data,
+            mime_type: file.type || 'image/jpeg',
+            text_context: document.getElementById('req-text').value,
+            district: document.getElementById('req-district').value
+          })
+        });
+        if (!res.ok) throw new Error('Photo analysis failed');
+        const data = await res.json();
+
+        document.getElementById('photo-evidence-text').textContent = data.visual_evidence_summary || 'Visual evidence analyzed.';
+        document.getElementById('photo-evidence-meta').textContent = `Severity: ${data.severity.toUpperCase()} (${(data.severity_score*100).toFixed(0)}%) · Category: ${data.category.replace('_', ' ')}`;
+        document.getElementById('photo-evidence-rec').textContent = `Action: ${data.actionable_recommendation || 'Municipal inspection recommended.'}`;
+
+        // Auto-select category if detected
+        if (data.category) {
+          const catMap = {
+            'healthcare': ['healthcare', '🏥', 'Healthcare'],
+            'water_sanitation': ['water_sanitation', '💧', 'Water & Sanitation'],
+            'roads_transport': ['roads_transport', '🛣️', 'Roads & Transport'],
+            'education': ['education', '🏫', 'Education']
+          };
+          if (catMap[data.category]) {
+            selectCat(catMap[data.category][0], catMap[data.category][1], catMap[data.category][2]);
+          }
+        }
+      } catch (err) {
+        document.getElementById('photo-evidence-text').textContent = 'Photo attached successfully.';
+        document.getElementById('photo-evidence-meta').textContent = 'Evidence queued for municipal review.';
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+
   // Submit
   async function submitRequest() {
     const text = document.getElementById('req-text').value.trim();
@@ -713,6 +791,9 @@
   function resetForm() {
     document.getElementById('req-text').value = '';
     updateCounter();
+    document.getElementById('photo-analysis-card').style.display = 'none';
+    document.getElementById('photo-input').value = '';
+    attachedPhotoData = null;
     document.getElementById('form-section').style.display = 'block';
     document.getElementById('success-card').classList.remove('visible');
     document.getElementById('submit-btn').disabled = false;

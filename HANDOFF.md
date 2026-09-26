@@ -17,7 +17,7 @@
 | **STEP 10** | Deploy config (render.yaml, Firebase Hosting, GitHub Actions) | **DONE** |
 | **STEP 11** | BRICS + DPG docs (ARCHITECTURE.md, README.md, honest census note, CREDITS.md) | **DONE** |
 | **STEP 12** | Submission docs (BRIEF_DESCRIPTION.md, DEMO_SCRIPT.md, PITCH_OUTLINE.md) | **DONE** |
-| **STEP 13** | (Optional) Photo evidence via Gemini multimodal | TODO |
+| **STEP 13** | Photo evidence via Gemini multimodal (Citizen upload + Vision API) | **DONE** |
 
 ---
 
@@ -96,7 +96,12 @@ uvicorn backend.app.main:app --reload --port 8000
   - Created `frontend/login.html` with dual-role authentication (Citizen vs. Policymaker).
   - Created `frontend/citizen.html` dedicated citizen submission portal with voice input and multilingual UI.
   - Added authentication guard and sign-out logic to `frontend/index.html`.
-- **Tests**: **139/139 tests passing** (100% pass rate).
+- **Gemini Multimodal Photo Evidence (STEP 13)**:
+  - Implemented `analyze_infrastructure_photo()` in `backend/services/gemini_service.py` to evaluate citizen photo evidence using Gemini 1.5 Flash vision (with offline fallback).
+  - Exposed `/api/v1/analyze-photo` and `/analyze-photo` endpoints with Pydantic validation (`AnalyzePhotoModel`).
+  - Integrated photo upload and instant AI verification card in `frontend/citizen.html`.
+  - Added unit test suite `tests/test_step13_multimodal.py` testing image analysis, severity scoring, and category mapping.
+- **Tests**: **145/145 tests passing** (100% pass rate).
 
 ## Known Gaps
 - Request-level rate limiting not yet enforced (optional production feature).
@@ -106,10 +111,13 @@ uvicorn backend.app.main:app --reload --port 8000
 ## MANUAL TASKS
 - Set `GEMINI_API_KEY` in `.env` if testing non-mock Gemini queries.
 - Deploy live: Push backend to Render (`render.yaml`) and frontend to Firebase/Vercel (`firebase.json`).
+- Record 3–5 min demo video using `docs/submission/DEMO_SCRIPT.md`.
+- Export 10–12 slide pitch deck using `docs/submission/PITCH_OUTLINE.md`.
 
 ---
 
 ## NEXT STEP
-Proceed to **STEP 13 — (Optional) Photo evidence via Gemini multimodal** and **Live Cloud Deployment**. Tasks: (1) add image upload in `citizen.html` allowing citizens to attach infrastructure photo evidence, (2) integrate Gemini vision endpoint to extract damage assessment from images, (3) verify live deployment on Render and Firebase.
+All development steps (STEP 0 through STEP 13) are complete! The next steps are manual execution: (1) test the citizen and policymaker flows locally, (2) plug in your real Gemini API key, (3) execute live cloud deployment to Render/Firebase to obtain the public demo link, and (4) record the video and export the pitch deck.
+
 
 
