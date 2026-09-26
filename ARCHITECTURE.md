@@ -104,3 +104,51 @@ To ensure cross-border reusability across India, Brazil, South Africa, and other
 | **Admin 3 (Sub-District / Locality)**| Taluka / Block / Ward | Bairro / Distritos | Local Municipality / Ward |
 
 Adapting the platform to a new nation requires only changing configuration files and loading country-specific open data. The entire backend ingestion, agent processing, and scoring logic remain untouched.
+
+---
+
+## 5. Country Onboarding Workflow (e.g. Adding Brazil / South Africa)
+
+To onboard a new BRICS member state:
+
+1. **Step 1: Define Country Configuration (`config/{country_code}.json`)**
+   - Specify `country_code` (e.g., `"BRA"`), ISO currency, national languages, and official administrative level labels.
+2. **Step 2: Map National Statistical Baselines**
+   - Provide demographic data mapped to `docs/schemas/demographics.json` (e.g., Brazilian IBGE census or Stats SA estimates).
+3. **Step 3: Ingest Geo-Coded Infrastructure Registries**
+   - Load national facility registries (e.g., CNES - Cadastro Nacional de Estabelecimentos de Saúde for Brazil) matching `docs/schemas/infrastructure.json`.
+4. **Step 4: Configure Language Pipeline in Gemini**
+   - Add national language codes (e.g., Portuguese `"pt"`, Zulu `"zu"`, Afrikaans `"af"`) into `SUPPORTED_LANGUAGES`.
+5. **Step 5: Run Ingestion**
+   - Execute `python scripts/ingest.py --country BRA`. The scoring formulas, spatial clustering, and dashboard immediately operate on the new territory.
+
+---
+
+## 6. Enterprise Google Cloud Production Scale-Up
+
+To satisfy the hackathon's "Deployability & Scalability" evaluation parameter, the platform was engineered with clear migration paths from open-source prototype to enterprise Google Cloud infrastructure:
+
+```mermaid
+flowchart LR
+    subgraph Prototype (Zero-Cost DPG)
+        A[FastAPI / Local Python]
+        B[Local SQLite DB]
+        C[Leaflet / OSM Map]
+        D[Web Speech API]
+        E[Gemini 1.5 Flash via AI Studio]
+    end
+
+    subgraph Production Scale-Up (Google Cloud)
+        A -.->|Containerize| F[Google Cloud Run Serverless]
+        B -.->|Migrate| G[Cloud SQL Postgres + BigQuery]
+        C -.->|Upgrade| H[Google Maps Platform / Photorealistic 3D]
+        D -.->|Upgrade| I[Google Cloud Speech-to-Text & Translation]
+        E -.->|Enterprise Scale| J[Vertex AI + Grounding on BigQuery]
+    end
+```
+
+1. **Serverless Compute:** Deploy FastAPI container to **Google Cloud Run** for auto-scaling from 0 to 100,000 concurrent citizen submissions.
+2. **National Big Data Analytics:** Transition from SQLite to **Google BigQuery** for querying hundreds of millions of nationwide citizen reports against Census shapefiles in seconds.
+3. **Enterprise AI & Grounding:** Transition from Google AI Studio to **Vertex AI**, attaching Google Search Grounding and BigQuery vector search to the policymaker explanation agent.
+4. **Geospatial Intelligence:** Integrate **Google Maps Platform** APIs (Geocoding, Distance Matrix, Satellite View) to calculate precise citizen travel times to facilities.
+

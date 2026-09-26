@@ -15,36 +15,42 @@ function getMarkerRadius(score) {
 
 function initMap() {
   const mapContainer = document.getElementById("leaflet-map");
-  if (!mapContainer || mapInstance) return;
+  if (!mapContainer || mapInstance || typeof L === "undefined") return;
 
-  // Center map across Maharashtra and Uttar Pradesh pilot regions
-  mapInstance = L.map("leaflet-map").setView([21.5, 78.5], 6);
+  try {
+    // Center map across Maharashtra and Uttar Pradesh pilot regions
+    mapInstance = L.map("leaflet-map").setView([21.5, 78.5], 6);
 
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    maxZoom: 18
-  }).addTo(mapInstance);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      maxZoom: 18
+    }).addTo(mapInstance);
 
-  markersLayerGroup = L.layerGroup().addTo(mapInstance);
+    markersLayerGroup = L.layerGroup().addTo(mapInstance);
 
-  // Add map legend
-  const legend = L.control({ position: "bottomright" });
-  legend.onAdd = function () {
-    const div = L.DomUtil.create("div", "map-legend-card");
-    div.innerHTML = `
-      <strong>Priority Score Legend</strong><br>
-      <div><span class="legend-dot dot-red"></span> 75 – 100 (Critical Need)</div>
-      <div><span class="legend-dot dot-amber"></span> 50 – 74 (Moderate Need)</div>
-      <div><span class="legend-dot dot-green"></span> 0 – 49 (Baseline Need)</div>
-    `;
-    return div;
-  };
-  legend.addTo(mapInstance);
+    // Add map legend
+    const legend = L.control({ position: "bottomright" });
+    legend.onAdd = function () {
+      const div = L.DomUtil.create("div", "map-legend-card");
+      div.innerHTML = `
+        <strong>Priority Score Legend</strong><br>
+        <div><span class="legend-dot dot-red"></span> 75 – 100 (Critical Need)</div>
+        <div><span class="legend-dot dot-amber"></span> 50 – 74 (Moderate Need)</div>
+        <div><span class="legend-dot dot-green"></span> 0 – 49 (Baseline Need)</div>
+      `;
+      return div;
+    };
+    legend.addTo(mapInstance);
+  } catch (err) {
+    console.warn("Failed to initialize Leaflet map:", err);
+  }
 }
 
 function renderMapMarkers(districts, onSelectDistrictCallback) {
+  if (typeof L === "undefined") return;
   if (!mapInstance) initMap();
-  markersLayerGroup.clearLayers();
+  if (!mapInstance || !markersLayerGroup) return;
+
 
   if (!districts || districts.length === 0) return;
 

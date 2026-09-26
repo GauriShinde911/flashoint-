@@ -120,9 +120,24 @@ async function main() {
   // Load core data
   await loadAllData();
 
-  // Initialize map
-  initMap();
-  renderMapMarkers(allDistricts, onSelectDistrict);
+  // Initialize map safely
+  try {
+    if (typeof L !== "undefined") {
+      initMap();
+      renderMapMarkers(allDistricts, onSelectDistrict);
+    } else {
+      console.warn("Leaflet map library (L) not available.");
+      const mapEl = document.getElementById("leaflet-map");
+      if (mapEl) {
+        mapEl.innerHTML = `<div style="padding: 24px; text-align: center; color: #475569; font-weight: 500;">
+          🗺️ <strong>Interactive Pilot Region View</strong><br>
+          <span style="font-size: 0.9em; color: #64748b;">(Select a district from the ranked recommendations table below to inspect full evidence panel.)</span>
+        </div>`;
+      }
+    }
+  } catch (mapErr) {
+    console.warn("Map setup warning:", mapErr);
+  }
 
   // Default evidence panel
   renderEvidencePanel(null, null);

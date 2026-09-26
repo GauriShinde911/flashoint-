@@ -15,8 +15,8 @@
 | **STEP 8** | Gemini explanation layer + NL query (/explain, /query endpoints) | **DONE** |
 | **STEP 9** | Backend API completion (CORS, validation, endpoints, tests) | **DONE** |
 | **STEP 10** | Deploy config (render.yaml, Firebase Hosting, GitHub Actions) | **DONE** |
-| **STEP 11** | BRICS + DPG docs (ARCHITECTURE.md, README.md, honest census note) | TODO |
-| **STEP 12** | Submission docs (BRIEF_DESCRIPTION.md, DEMO_SCRIPT.md, PITCH_OUTLINE.md) | TODO |
+| **STEP 11** | BRICS + DPG docs (ARCHITECTURE.md, README.md, honest census note, CREDITS.md) | **DONE** |
+| **STEP 12** | Submission docs (BRIEF_DESCRIPTION.md, DEMO_SCRIPT.md, PITCH_OUTLINE.md) | **DONE** |
 | **STEP 13** | (Optional) Photo evidence via Gemini multimodal | TODO |
 
 ---
@@ -84,11 +84,18 @@ uvicorn backend.app.main:app --reload --port 8000
   - Strict Pydantic Field validation for `SubmitRequestModel` (`raw_text` length 1–2000, `source_channel` enum `"voice"`|`"text"`|`"messaging_app"`) and `QueryModel` (`query` length 1–500), returning 422 HTTP errors on invalid input.
   - Tightened CORS configuration in `backend/app/config.py` with configurable origin lists via `ALLOWED_ORIGINS` env var (wildcard `*` removed).
   - Resolved Python 3.12 `datetime.utcnow()` deprecation warnings with `datetime.now(timezone.utc)`.
-- **Zero-Cost Production Deploy Configuration (STEP 10)**:
-  - Created `render.yaml` for zero-cost deployment of FastAPI backend on Render free tier.
-  - Created `firebase.json` & `.firebaserc` for static hosting of frontend dashboard on Firebase Hosting.
-  - Created GitHub Actions workflow `.github/workflows/ingest_cron.yml` for automated daily data ingestion and test execution.
-  - Added unit test suite `tests/test_deploy_config.py` verifying deployment manifests and workflow syntax.
+- **BRICS & DPG Documentation (STEP 11)**:
+  - Completely rewrote `README.md` with executive summary, problem pillars, Gemini architecture diagram, real data disclosure, BRICS mapping, and Google Cloud production roadmap.
+  - Expanded `ARCHITECTURE.md` with Section 5 (Country Onboarding Workflow for Brazil/South Africa) and Section 6 (Google Cloud Production Scale-Up).
+  - Populated `CREDITS.md` with official government citations (`data.gov.in`, Census 2011, NFHS-5) and open source licenses.
+- **Hackathon Submission Package (STEP 12)**:
+  - Created `docs/submission/BRIEF_DESCRIPTION.md` (2–3 line summary options).
+  - Created `docs/submission/DEMO_SCRIPT.md` (minute-by-minute 3–5 min video recording script).
+  - Created `docs/submission/PITCH_OUTLINE.md` (10–12 slide deck outline).
+- **Citizen / Policymaker Portal Separation**:
+  - Created `frontend/login.html` with dual-role authentication (Citizen vs. Policymaker).
+  - Created `frontend/citizen.html` dedicated citizen submission portal with voice input and multilingual UI.
+  - Added authentication guard and sign-out logic to `frontend/index.html`.
 - **Tests**: **139/139 tests passing** (100% pass rate).
 
 ## Known Gaps
@@ -98,23 +105,11 @@ uvicorn backend.app.main:app --reload --port 8000
 
 ## MANUAL TASKS
 - Set `GEMINI_API_KEY` in `.env` if testing non-mock Gemini queries.
-- For production expansion beyond pilot districts, full national data.gov.in CSV extracts can be fetched and loaded with the same loader contracts.
-
----
-
-## What works in STEP 6 (Frontend Dashboard)
-- **Leaflet map** showing all 3 pilot districts (Pune, Thane, Varanasi) with colour-coded priority circles.
-- **6 tabs**: Ranked Recommendations, Silent Need Flags, Investment-Demand Mismatch, Impact Measurement, AI Command Center, Submit Request.
-- **Right evidence panel**: score ring, breakdown bar chart (SVG), stats, explanation, project status.
-- **Language switcher**: English / हिन्दी / मराठी via `i18n.js` dictionary.
-- **Offline Demo Mode**: falls back to `frontend/mock/*.json` when backend is unreachable.
-- **Voice input** via Web Speech API on Submit Request form (Chrome/Edge only).
-- **No build tooling**: pure HTML + CSS + vanilla JS, Leaflet via CDN.
-- To run: `python -m http.server 3000` inside `frontend/`.
+- Deploy live: Push backend to Render (`render.yaml`) and frontend to Firebase/Vercel (`firebase.json`).
 
 ---
 
 ## NEXT STEP
-Proceed to **STEP 11 — BRICS + DPG docs (ARCHITECTURE.md, README.md, honest census note)**. Tasks: (1) review & expand `ARCHITECTURE.md` with explicit BRICS generic hierarchy (Country -> Admin 1 -> Admin 2 -> Locality) and onboarding steps for new nations, (2) update `README.md` with full problem pillars, DPG note, DPG license statement, and zero-cost stack breakdown, (3) ensure honest Census 2011 + NFHS-5 disclosure note is prominent in README and API dataset endpoint.
+Proceed to **STEP 13 — (Optional) Photo evidence via Gemini multimodal** and **Live Cloud Deployment**. Tasks: (1) add image upload in `citizen.html` allowing citizens to attach infrastructure photo evidence, (2) integrate Gemini vision endpoint to extract damage assessment from images, (3) verify live deployment on Render and Firebase.
 
 

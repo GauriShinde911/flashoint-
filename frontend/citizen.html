@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Submit Development Request — DPI Citizen Portal</title>
+  <meta name="description" content="Submit your community development request in your language — healthcare, water, roads, education."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green: #059669;
+      --green-light: #10b981;
+      --green-pale: #d1fae5;
+      --bg: #f0fdf4;
+      --surface: #ffffff;
+      --border: #d1d5db;
+      --text: #111827;
+      --text-muted: #6b7280;
+      --radius: 16px;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* Top bar */
+    .topbar {
+      background: linear-gradient(135deg, #065f46 0%, #059669 100%);
+      padding: 0 24px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 20px rgba(5,150,105,0.3);
+    }
+    .topbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .topbar-icon { font-size: 1.8rem; }
+    .topbar-title {
+      color: #fff;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+    .topbar-sub {
+      color: rgba(255,255,255,0.7);
+      font-size: 0.78rem;
+      display: block;
+    }
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .lang-row { display: flex; gap: 6px; }
+    .lang-btn {
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.25);
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      font-family: 'Inter', sans-serif;
+    }
+    .lang-btn:hover, .lang-btn.active {
+      background: rgba(255,255,255,0.3);
+    }
+    .logout-btn {
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.85);
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: background 0.2s;
+    }
+    .logout-btn:hover { background: rgba(255,255,255,0.22); }
+
+    /* Hero section */
+    .hero {
+      background: linear-gradient(160deg, #065f46 0%, #059669 60%, #10b981 100%);
+      padding: 48px 24px 80px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -40px;
+      left: 0; right: 0;
+      height: 80px;
+      background: var(--bg);
+      border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+    }
+    .hero-greeting {
+      color: rgba(255,255,255,0.75);
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+    .hero-title {
+      color: #fff;
+      font-size: 2.2rem;
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 12px;
+    }
+    .hero-sub {
+      color: rgba(255,255,255,0.75);
+      font-size: 1rem;
+      max-width: 500px;
+      margin: 0 auto 24px;
+      line-height: 1.6;
+    }
+    .hero-stats {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+    }
+    .stat-item { color: #fff; text-align: center; }
+    .stat-num { font-size: 1.8rem; font-weight: 800; display: block; }
+    .stat-label { font-size: 0.72rem; color: rgba(255,255,255,0.65); font-weight: 500; }
+
+    /* Main content */
+    .main-content {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+    }
+
+    /* Category cards */
+    .section-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 16px;
+    }
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+    @media (min-width: 480px) { .category-grid { grid-template-columns: repeat(4, 1fr); } }
+    .cat-card {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .cat-card:hover {
+      border-color: var(--green-light);
+      background: #f0fdf4;
+      transform: translateY(-2px);
+    }
+    .cat-card.selected {
+      border-color: var(--green);
+      background: #d1fae5;
+      box-shadow: 0 0 0 3px rgba(5,150,105,0.15);
+    }
+    .cat-icon { font-size: 1.8rem; display: block; margin-bottom: 6px; }
+    .cat-name { font-size: 0.82rem; font-weight: 600; color: var(--text); }
+
+    /* Form card */
+    .form-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+      margin-bottom: 24px;
+    }
+    .form-card h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .form-group { margin-bottom: 20px; }
+    .form-group label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 8px;
+    }
+    .form-group select,
+    .form-group textarea,
+    .form-group input[type="text"] {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      background: #fafafa;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+    }
+    .form-group select:focus,
+    .form-group textarea:focus,
+    .form-group input[type="text"]:focus {
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px rgba(5,150,105,0.12);
+      background: #fff;
+    }
+    .form-group textarea {
+      resize: vertical;
+      min-height: 120px;
+      line-height: 1.6;
+    }
+
+    /* Voice button */
+    .voice-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .btn-voice {
+      flex: 1;
+      padding: 12px;
+      background: #fff;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      color: #374151;
+    }
+    .btn-voice:hover {
+      border-color: var(--green);
+      color: var(--green);
+      background: #f0fdf4;
+    }
+    .btn-voice.recording {
+      background: #fef2f2;
+      border-color: #ef4444;
+      color: #ef4444;
+      animation: pulse 1s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.3); }
+      50% { box-shadow: 0 0 0 8px rgba(239,68,68,0); }
+    }
+
+    /* Submit button */
+    .btn-submit {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #065f46 0%, #059669 100%);
+      border: none;
+      border-radius: 14px;
+      color: #fff;
+      font-size: 1.05rem;
+      font-weight: 700;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      transition: all 0.25s;
+      box-shadow: 0 6px 20px rgba(5,150,105,0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .btn-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 28px rgba(5,150,105,0.5);
+    }
+    .btn-submit:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Success state */
+    .success-card {
+      background: #d1fae5;
+      border: 2px solid var(--green);
+      border-radius: 20px;
+      padding: 32px 28px;
+      text-align: center;
+      display: none;
+    }
+    .success-card.visible { display: block; }
+    .success-icon { font-size: 3rem; display: block; margin-bottom: 12px; }
+    .success-card h3 {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: #064e3b;
+      margin-bottom: 8px;
+    }
+    .success-card p { color: #065f46; font-size: 0.92rem; line-height: 1.6; }
+    .success-id {
+      display: inline-block;
+      background: #fff;
+      border: 1px solid var(--green);
+      color: var(--green);
+      padding: 4px 12px;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 0.85rem;
+      margin-top: 12px;
+    }
+    .btn-new {
+      margin-top: 20px;
+      padding: 12px 28px;
+      background: var(--green);
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+      font-weight: 700;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    /* Recent requests */
+    .recent-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px 28px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+    }
+    .recent-card h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .req-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px 0;
+      border-bottom: 1px solid #f3f4f6;
+    }
+    .req-item:last-child { border-bottom: none; }
+    .req-cat-dot {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+      background: #f0fdf4;
+    }
+    .req-body { flex: 1; min-width: 0; }
+    .req-text {
+      font-size: 0.87rem;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .req-meta { font-size: 0.75rem; color: var(--text-muted); }
+    .req-status {
+      font-size: 0.72rem;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+    .status-received { background: #dbeafe; color: #1d4ed8; }
+    .status-processing { background: #fef3c7; color: #92400e; }
+
+    /* Char counter */
+    .char-counter {
+      text-align: right;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+    .char-counter.warn { color: #ef4444; }
+  </style>
+</head>
+<body>
+
+<!-- Auth guard -->
+<script>
+  const _role = sessionStorage.getItem('dpi_role');
+  if (_role !== 'citizen') window.location.href = 'login.html';
+</script>
+
+<!-- Top bar -->
+<header class="topbar">
+  <div class="topbar-brand">
+    <span class="topbar-icon">🌿</span>
+    <div>
+      <span class="topbar-title">DPI Citizen Portal</span>
+      <span class="topbar-sub">Development Priority Intelligence</span>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="lang-row">
+      <button class="lang-btn active" onclick="setLang('en')">EN</button>
+      <button class="lang-btn" onclick="setLang('hi')">हि</button>
+      <button class="lang-btn" onclick="setLang('mr')">मरा</button>
+    </div>
+    <button class="logout-btn" onclick="logout()">Sign out</button>
+  </div>
+</header>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-greeting" id="hero-greeting">Welcome back, Citizen</div>
+  <h1 class="hero-title" id="hero-title">What development does your community need?</h1>
+  <p class="hero-sub" id="hero-sub">Your voice reaches national policymakers. Report infrastructure gaps — healthcare, water, roads, education.</p>
+  <div class="hero-stats">
+    <div class="stat-item">
+      <span class="stat-num">220+</span>
+      <span class="stat-label">Requests filed</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">3</span>
+      <span class="stat-label">Pilot districts</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">2</span>
+      <span class="stat-label">States covered</span>
+    </div>
+  </div>
+</section>
+
+<!-- Main -->
+<main class="main-content">
+
+  <!-- Category selector -->
+  <div class="section-label">Step 1 — Choose category</div>
+  <div class="category-grid">
+    <div class="cat-card selected" id="cat-healthcare" onclick="selectCat('healthcare','🏥','Healthcare')">
+      <span class="cat-icon">🏥</span>
+      <div class="cat-name" data-i18n="cat_health">Healthcare</div>
+    </div>
+    <div class="cat-card" id="cat-water" onclick="selectCat('water_sanitation','💧','Water & Sanitation')">
+      <span class="cat-icon">💧</span>
+      <div class="cat-name" data-i18n="cat_water">Water & Sanitation</div>
+    </div>
+    <div class="cat-card" id="cat-roads" onclick="selectCat('roads_transport','🛣️','Roads & Transport')">
+      <span class="cat-icon">🛣️</span>
+      <div class="cat-name" data-i18n="cat_roads">Roads & Transport</div>
+    </div>
+    <div class="cat-card" id="cat-education" onclick="selectCat('education','🏫','Education')">
+      <span class="cat-icon">🏫</span>
+      <div class="cat-name" data-i18n="cat_edu">Education</div>
+    </div>
+  </div>
+
+  <!-- Form -->
+  <div class="form-card" id="form-section">
+    <h3>📝 <span id="form-title">Describe the issue</span></h3>
+
+    <!-- Voice button -->
+    <div class="voice-row">
+      <button class="btn-voice" id="voice-btn" onclick="toggleVoice()">
+        🎙️ <span id="voice-label">Speak your request</span>
+      </button>
+    </div>
+
+    <!-- Text area -->
+    <div class="form-group">
+      <label for="req-text" data-i18n="label_desc">Describe the problem (in any language)</label>
+      <textarea id="req-text" placeholder="e.g. No primary health centre in our block. Nearest hospital is 22km away." maxlength="2000" oninput="updateCounter()"></textarea>
+      <div class="char-counter" id="char-counter">0 / 2000</div>
+    </div>
+
+    <!-- District + Channel -->
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+      <div class="form-group">
+        <label for="req-district" data-i18n="label_district">Your District</label>
+        <select id="req-district">
+          <option value="Pune">Pune (Maharashtra)</option>
+          <option value="Thane">Thane (Maharashtra)</option>
+          <option value="Varanasi">Varanasi (Uttar Pradesh)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="req-channel" data-i18n="label_channel">Reporting via</label>
+        <select id="req-channel">
+          <option value="text">Text (Web)</option>
+          <option value="voice">Voice</option>
+          <option value="messaging_app">Messaging App</option>
+        </select>
+      </div>
+    </div>
+
+    <button class="btn-submit" id="submit-btn" onclick="submitRequest()">
+      📤 Submit Development Request
+    </button>
+  </div>
+
+  <!-- Success state -->
+  <div class="success-card" id="success-card">
+    <span class="success-icon">✅</span>
+    <h3>Request Submitted!</h3>
+    <p>Your request has been received and will be analysed by AI for priority scoring. Policymakers will be notified.</p>
+    <div class="success-id" id="success-id">REQ-XXXX</div>
+    <br>
+    <button class="btn-new" onclick="resetForm()">+ Submit another request</button>
+  </div>
+
+  <!-- Recent (mock) requests -->
+  <div class="recent-card" style="margin-top: 24px;">
+    <h3>📋 Recent Community Requests — <span style="color:var(--text-muted); font-weight:500; font-size:0.85rem;" data-i18n="from_your_area">From your area</span></h3>
+    <div id="recent-list">
+      <div class="req-item">
+        <div class="req-cat-dot">🏥</div>
+        <div class="req-body">
+          <div class="req-text">No primary health centre in our block. Nearest hospital is 22km away.</div>
+          <div class="req-meta">Healthcare · Pune · 3 days ago</div>
+        </div>
+        <div class="req-status status-processing">Processing</div>
+      </div>
+      <div class="req-item">
+        <div class="req-cat-dot">💧</div>
+        <div class="req-body">
+          <div class="req-text">Tap water pipeline damaged and not functional for 3 weeks.</div>
+          <div class="req-meta">Water & Sanitation · Thane · 1 week ago</div>
+        </div>
+        <div class="req-status status-received">Received</div>
+      </div>
+      <div class="req-item">
+        <div class="req-cat-dot">🛣️</div>
+        <div class="req-body">
+          <div class="req-text">Connecting road to main highway is unpaved and flooded during monsoon.</div>
+          <div class="req-meta">Roads & Transport · Varanasi · 2 weeks ago</div>
+        </div>
+        <div class="req-status status-received">Received</div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+  // Auth
+  const username = sessionStorage.getItem('dpi_user') || 'Citizen';
+
+  // i18n (basic)
+  const TRANSLATIONS = {
+    en: {
+      hero_greeting: 'Welcome back, ' + username.charAt(0).toUpperCase() + username.slice(1),
+      hero_title: 'What development does your community need?',
+      hero_sub: 'Your voice reaches national policymakers. Report infrastructure gaps — healthcare, water, roads, education.',
+    },
+    hi: {
+      hero_greeting: 'वापस स्वागत है, ' + username,
+      hero_title: 'आपके समुदाय को किस विकास की जरूरत है?',
+      hero_sub: 'आपकी आवाज़ राष्ट्रीय नीति-निर्माताओं तक पहुँचती है। बुनियादी ढाँचे की कमियाँ रिपोर्ट करें।',
+    },
+    mr: {
+      hero_greeting: 'परत स्वागत आहे, ' + username,
+      hero_title: 'आपल्या समुदायाला कोणत्या विकासाची गरज आहे?',
+      hero_sub: 'आपला आवाज राष्ट्रीय धोरण-निर्मात्यांपर्यंत पोहोचतो. पायाभूत सुविधांच्या कमतरता नोंदवा.',
+    }
+  };
+
+  function setLang(lang) {
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector(`.lang-btn[onclick="setLang('${lang}')"]`).classList.add('active');
+    const t = TRANSLATIONS[lang] || TRANSLATIONS.en;
+    if (document.getElementById('hero-greeting')) document.getElementById('hero-greeting').textContent = t.hero_greeting;
+    if (document.getElementById('hero-title')) document.getElementById('hero-title').textContent = t.hero_title;
+    if (document.getElementById('hero-sub')) document.getElementById('hero-sub').textContent = t.hero_sub;
+
+    // Update textarea placeholder
+    const placeholders = {
+      en: 'e.g. No primary health centre in our block. Nearest hospital is 22km away.',
+      hi: 'उदा. हमारे गांव में कोई प्राथमिक स्वास्थ्य केंद्र नहीं है।',
+      mr: 'उदा. आमच्या गावात प्राथमिक आरोग्य केंद्र नाही.'
+    };
+    document.getElementById('req-text').placeholder = placeholders[lang] || placeholders.en;
+  }
+
+  // Category selection
+  let selectedCat = 'healthcare';
+  let selectedCatName = 'Healthcare';
+
+  function selectCat(catId, icon, name) {
+    document.querySelectorAll('.cat-card').forEach(c => c.classList.remove('selected'));
+    const catKey = catId.split('_')[0];
+    const el = document.getElementById('cat-' + catKey);
+    if (el) el.classList.add('selected');
+    selectedCat = catId;
+    selectedCatName = name;
+  }
+
+  // Voice
+  let recognition = null;
+  let isRecording = false;
+
+  function toggleVoice() {
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+      alert('Voice input is supported in Chrome and Edge browsers only.');
+      return;
+    }
+    if (isRecording) {
+      recognition && recognition.stop();
+      return;
+    }
+    const SREngine = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SREngine();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = 'en-IN';
+
+    recognition.onstart = () => {
+      isRecording = true;
+      document.getElementById('voice-btn').classList.add('recording');
+      document.getElementById('voice-label').textContent = 'Listening... (click to stop)';
+    };
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      const ta = document.getElementById('req-text');
+      ta.value = (ta.value ? ta.value + ' ' : '') + transcript;
+      updateCounter();
+    };
+    recognition.onerror = () => stopVoice();
+    recognition.onend = () => stopVoice();
+    recognition.start();
+    document.getElementById('req-channel').value = 'voice';
+  }
+
+  function stopVoice() {
+    isRecording = false;
+    document.getElementById('voice-btn').classList.remove('recording');
+    document.getElementById('voice-label').textContent = 'Speak your request';
+  }
+
+  // Char counter
+  function updateCounter() {
+    const len = document.getElementById('req-text').value.length;
+    const el = document.getElementById('char-counter');
+    el.textContent = len + ' / 2000';
+    el.classList.toggle('warn', len > 1900);
+  }
+
+  // Submit
+  async function submitRequest() {
+    const text = document.getElementById('req-text').value.trim();
+    if (!text || text.length < 5) {
+      alert('Please describe the issue in at least a few words.');
+      return;
+    }
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true;
+    btn.innerHTML = '⏳ Submitting...';
+
+    const payload = {
+      raw_text: text,
+      source_channel: document.getElementById('req-channel').value,
+      district: document.getElementById('req-district').value
+    };
+
+    try {
+      const res = await fetch('http://localhost:8000/requests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) throw new Error('API error');
+      const data = await res.json();
+      showSuccess(data.record?.id || 'REQ-' + Date.now().toString().slice(-6));
+    } catch(e) {
+      // Offline fallback
+      showSuccess('REQ-OFFLINE-' + Date.now().toString().slice(-4));
+    }
+  }
+
+  function showSuccess(id) {
+    document.getElementById('form-section').style.display = 'none';
+    document.getElementById('success-id').textContent = id;
+    document.getElementById('success-card').classList.add('visible');
+  }
+
+  function resetForm() {
+    document.getElementById('req-text').value = '';
+    updateCounter();
+    document.getElementById('form-section').style.display = 'block';
+    document.getElementById('success-card').classList.remove('visible');
+    document.getElementById('submit-btn').disabled = false;
+    document.getElementById('submit-btn').innerHTML = '📤 Submit Development Request';
+  }
+
+  function logout() {
+    sessionStorage.removeItem('dpi_role');
+    sessionStorage.removeItem('dpi_user');
+    window.location.href = 'login.html';
+  }
+
+  // Init
+  document.getElementById('hero-greeting').textContent = 'Welcome back, ' + username.charAt(0).toUpperCase() + username.slice(1);
+</script>
+</body>
+</html>

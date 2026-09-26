@@ -6,8 +6,8 @@
   <title>Development Priority Intelligence — BRICS Digital Public Infrastructure</title>
   <meta name="description" content="AI-powered multilingual platform to prioritize government development investments across districts — healthcare, water, roads, education. Track 1 BRICS Hackathon."/>
 
-  <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <!-- Leaflet CSS (Local Vendor) -->
+  <link rel="stylesheet" href="vendor/leaflet/leaflet.css"/>
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -18,6 +18,14 @@
   <link rel="stylesheet" href="css/style.css"/>
 </head>
 <body>
+
+<!-- Auth guard: redirect to login if not admin -->
+<script>
+  (function() {
+    var role = sessionStorage.getItem('dpi_role');
+    if (role !== 'admin') { window.location.href = 'login.html'; }
+  })();
+</script>
 
   <!-- ===== TOP BAR ===== -->
   <header class="topbar" role="banner">
@@ -32,6 +40,7 @@
         <button class="lang-btn" data-lang="hi" aria-label="हिन्दी में बदलें">हि</button>
         <button class="lang-btn" data-lang="mr" aria-label="मराठीत बदला">मरा</button>
       </nav>
+      <button id="admin-logout-btn" onclick="(function(){sessionStorage.removeItem('dpi_role');sessionStorage.removeItem('dpi_user');window.location.href='login.html';})()" style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.85);padding:6px 14px;border-radius:8px;font-size:0.78rem;cursor:pointer;font-family:inherit;">Sign out</button>
     </div>
   </header>
 
@@ -165,9 +174,8 @@
     </div>
   </footer>
 
-  <!-- ===== SCRIPTS ===== -->
-  <!-- Leaflet JS -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV/XN/WPeM=" crossorigin=""></script>
+  <!-- Leaflet JS (Local Vendor) -->
+  <script src="vendor/leaflet/leaflet.js"></script>
 
   <!-- App Scripts in dependency order -->
   <script src="config.js"></script>
