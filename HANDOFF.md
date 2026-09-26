@@ -14,7 +14,7 @@
 | **STEP 7** | Gemini understanding layer (ADK / pipeline, USE_MOCK_GEMINI) | **DONE** |
 | **STEP 8** | Gemini explanation layer + NL query (/explain, /query endpoints) | **DONE** |
 | **STEP 9** | Backend API completion (CORS, validation, endpoints, tests) | **DONE** |
-| **STEP 10** | Deploy config (render.yaml, Firebase Hosting, GitHub Actions) | TODO |
+| **STEP 10** | Deploy config (render.yaml, Firebase Hosting, GitHub Actions) | **DONE** |
 | **STEP 11** | BRICS + DPG docs (ARCHITECTURE.md, README.md, honest census note) | TODO |
 | **STEP 12** | Submission docs (BRIEF_DESCRIPTION.md, DEMO_SCRIPT.md, PITCH_OUTLINE.md) | TODO |
 | **STEP 13** | (Optional) Photo evidence via Gemini multimodal | TODO |
@@ -84,8 +84,12 @@ uvicorn backend.app.main:app --reload --port 8000
   - Strict Pydantic Field validation for `SubmitRequestModel` (`raw_text` length 1–2000, `source_channel` enum `"voice"`|`"text"`|`"messaging_app"`) and `QueryModel` (`query` length 1–500), returning 422 HTTP errors on invalid input.
   - Tightened CORS configuration in `backend/app/config.py` with configurable origin lists via `ALLOWED_ORIGINS` env var (wildcard `*` removed).
   - Resolved Python 3.12 `datetime.utcnow()` deprecation warnings with `datetime.now(timezone.utc)`.
-  - Added 18 unit and integration tests in `tests/test_step9_api_completion.py`.
-- **Tests**: **132/132 tests passing** (100% pass rate after `python scripts/ingest.py`).
+- **Zero-Cost Production Deploy Configuration (STEP 10)**:
+  - Created `render.yaml` for zero-cost deployment of FastAPI backend on Render free tier.
+  - Created `firebase.json` & `.firebaserc` for static hosting of frontend dashboard on Firebase Hosting.
+  - Created GitHub Actions workflow `.github/workflows/ingest_cron.yml` for automated daily data ingestion and test execution.
+  - Added unit test suite `tests/test_deploy_config.py` verifying deployment manifests and workflow syntax.
+- **Tests**: **139/139 tests passing** (100% pass rate).
 
 ## Known Gaps
 - Request-level rate limiting not yet enforced (optional production feature).
@@ -111,5 +115,6 @@ uvicorn backend.app.main:app --reload --port 8000
 ---
 
 ## NEXT STEP
-Proceed to **STEP 10 — Deploy config (render.yaml, Firebase Hosting, GitHub Actions)**. Tasks: (1) create `render.yaml` for FastAPI backend deployment on Render free tier, (2) create `firebase.json` & `.firebaserc` for frontend deployment on Firebase Hosting, (3) create GitHub Actions workflow `.github/workflows/ingest_cron.yml` for scheduled ingestion refresh, (4) verify deploy configurations and update README deployment instructions.
+Proceed to **STEP 11 — BRICS + DPG docs (ARCHITECTURE.md, README.md, honest census note)**. Tasks: (1) review & expand `ARCHITECTURE.md` with explicit BRICS generic hierarchy (Country -> Admin 1 -> Admin 2 -> Locality) and onboarding steps for new nations, (2) update `README.md` with full problem pillars, DPG note, DPG license statement, and zero-cost stack breakdown, (3) ensure honest Census 2011 + NFHS-5 disclosure note is prominent in README and API dataset endpoint.
+
 
