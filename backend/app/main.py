@@ -209,10 +209,37 @@ def natural_language_query(query_data: QueryModel):
     filt = parsed["structured_filter"]
 
     results = districts
+
+    # State filter
     if filt.get("state"):
         results = [r for r in results if r["admin1"].lower() == filt["state"].lower()]
-    if filt.get("district"):
+
+    # District filter (single or compound districts list)
+    if filt.get("districts"):
+        allowed = [d.lower() for d in filt["districts"]]
+        results = [r for r in results if r["district_name"].lower() in allowed]
+    elif filt.get("district"):
         results = [r for r in results if r["district_name"].lower() == filt["district"].lower()]
+
+    # Sector filter (single or compound sectors list)
+    if filt.get("sectors"):
+        allowed_s = [s.lower() for s in filt["sectors"]]
+        results = [r for r in results if r.get("sector", "").lower() in allowed_s]
+    elif filt.get("sector"):
+        results = [r for r in results if r.get("sector", "").lower() == filt["sector"].lower()]
+
+    # Min score filter
+    if filt.get("min_score") is not None:
+        results = [r for r in results if r["priority_score"] >= filt["min_score"]]
+
+    # Sort
+    sort_key = filt.get("sort", "priority_score_desc")
+    if sort_key == "demand_desc":
+        results = sorted(results, key=lambda x: x.get("citizen_demand_count", 0), reverse=True)
+    elif sort_key == "investment_asc":
+        results = sorted(results, key=lambda x: x.get("existing_investment_cr", 0))
+    else:  # priority_score_desc (default)
+        results = sorted(results, key=lambda x: x["priority_score"], reverse=True)
 
     return {
         "query": query_data.query,

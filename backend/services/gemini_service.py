@@ -1,11 +1,19 @@
 """
-Gemini Understanding & Explanation Service  —  STEP 7
-======================================================
-4-stage pipeline (ADK-style):
+Gemini Understanding & Explanation Service  —  STEP 7 + STEP 8
+===============================================================
+4-stage understanding pipeline (ADK-style):
   Stage 1 — Language Detection
   Stage 2 — Category / Urgency Classification
   Stage 3 — Location + Entity Extraction
   Stage 4 — Semantic Clustering
+
+Explanation layer (STEP 8):
+  generate_grounded_explanation() — structured evidence_summary + data_quality badge.
+  Gemini rephrases; it NEVER invents numbers.
+
+NL Query parser (STEP 8):
+  parse_natural_language_query() — compound sector/district/state/sort/min_score support.
+  Gemini parses intent; backend executes deterministically.
 
 USE_MOCK_GEMINI=true  → fully deterministic offline path (no API key needed)
 USE_MOCK_GEMINI=false → real Gemini 1.5-flash call; falls back to deterministic
@@ -261,8 +269,40 @@ def understand_citizen_request(
 
 
 # ===========================================================================
-# Public API — Explanation Layer
+# Public API — Explanation Layer  (STEP 8 upgrade)
 # ===========================================================================
+
+_EXPLAIN_PROMPT_TEMPLATE = """
+You are a senior policy analyst. Rewrite the following district prioritization
+justification in clear, professional English for a national policymaker audience.
+Do NOT invent, alter, or omit any numbers. Use formal language.
+Output the rewritten text only — no preamble, no markdown.
+
+Justification:
+{text}
+""".strip()
+
+
+def _build_explanation_text(
+    district_name: str,
+    state: str,
+    score: float,
+    pop_str: str,
+    facilities: int,
+    demand: int,
+    inv_cr: float,
+    rank: Optional[int] = None,
+) -> str:
+    """Builds the deterministic explanation sentence used in both mock + live modes."""
+    rank_clause = f" (Rank #{rank})" if rank is not None else ""
+    return (
+        f"{district_name} ({state}){rank_clause} achieves a Priority Score of {score}/100. "
+        f"Key drivers: population of {pop_str} affected, only {facilities} healthcare "
+        f"facilities recorded, {demand} citizen-reported demand requests logged, and existing "
+        f"government investment of \u20b9{inv_cr} Cr — leaving a significant unmet gap. "
+        f"No active central or state scheme currently fully closes this demand shortfall."
+    )
+
 
 def generate_grounded_explanation(
     district_name: str,
@@ -270,9 +310,9 @@ def generate_grounded_explanation(
     score_info: Dict[str, Any],
 ) -> Dict[str, Any]:
     """
-    Gemini Explanation Layer.
-    Produces a grounded, evidence-cited justification from ACTUAL numbers.
-    Gemini explains; it never invents the ranking.
+    Gemini Explanation Layer  (STEP 8).
+    Returns structured evidence_summary + data_quality badge + optional rank.
+    Gemini rephrases the deterministic text; it NEVER invents numbers.
     """
     pop = district_info.get("population", 0)
     pop_str = f"{round(pop / 100_000.0, 1)} lakh"
@@ -281,36 +321,46 @@ def generate_grounded_explanation(
     inv_cr = district_info.get("existing_investment_cr", 0.0)
     score = score_info.get("priority_score", 0.0)
     state = district_info.get("admin1", "India")
+    rank = district_info.get("rank")  # may be None if not passed
+    data_quality = district_info.get("data_quality", "real")
 
-    explanation_text = (
-        f"{district_name} ({state}) is prioritized with a Priority Score of {score}/100 "
-        f"because it combines a large affected population of {pop_str}, "
-        f"severe infrastructure shortfall ({facilities} facilities available), "
-        f"high citizen-reported demand ({demand} requests), and comparatively low existing "
-        f"public investment of \u20b9{inv_cr} Cr. "
-        f"No major active scheme currently fully addresses this demand gap."
+    # Always build deterministic text first (safe baseline + unit-testable)
+    explanation_text = _build_explanation_text(
+        district_name, state, score, pop_str, facilities, demand, inv_cr, rank
     )
+    explanation_mode = "deterministic"
 
-    # Attempt live Gemini enrichment (rephrase grounded explanation)
+    # Live Gemini rephrase (never changes numbers; only improves prose)
     if not USE_MOCK_GEMINI and GEMINI_API_KEY:
         try:
             import google.generativeai as genai  # type: ignore
             genai.configure(api_key=GEMINI_API_KEY)
             model = genai.GenerativeModel("gemini-1.5-flash")
-            enrich_prompt = (
-                f"Rewrite the following policymaker justification in clear, professional English. "
-                f"Do NOT invent any numbers or change the facts. Output the rewritten text only.\n\n"
-                f"{explanation_text}"
-            )
-            resp = model.generate_content(enrich_prompt)
-            explanation_text = resp.text.strip() or explanation_text
+            prompt = _EXPLAIN_PROMPT_TEMPLATE.format(text=explanation_text)
+            resp = model.generate_content(prompt)
+            rephrased = resp.text.strip()
+            if rephrased:  # only replace if Gemini returned non-empty
+                explanation_text = rephrased
+                explanation_mode = "gemini_rephrased"
         except Exception as exc:
             print(f"[WARN] Gemini explanation enrichment failed, using deterministic text: {exc}")
 
     return {
         "district": district_name,
+        "state": state,
+        "rank": rank,
         "priority_score": score,
+        "data_quality": data_quality,
         "explanation": explanation_text,
+        "explanation_mode": explanation_mode,
+        "evidence_summary": {
+            "population": pop,
+            "population_readable": pop_str,
+            "facilities_count": facilities,
+            "citizen_demand_count": demand,
+            "existing_investment_cr": inv_cr,
+        },
+        # kept for backward-compat with existing tests
         "grounded_inputs": {
             "population": pop,
             "facilities_count": facilities,
@@ -325,7 +375,7 @@ def generate_grounded_explanation(
 
 
 # ===========================================================================
-# Public API — Natural Language Query Parser
+# Public API — Natural Language Query Parser  (STEP 8 upgrade)
 # ===========================================================================
 
 _NL_QUERY_PROMPT = """
@@ -334,64 +384,90 @@ Return valid JSON ONLY — no markdown, no explanation.
 
 Query: "{query}"
 
-Required JSON:
+Required JSON (use null for absent fields):
 {{
-  "state": "<state name or null>",
-  "district": "<district name or null>",
-  "sector": "<healthcare | water_sanitation | roads_transport | education | null>",
-  "sort": "<priority_score_desc | demand_desc | investment_asc>"
+  "state": "<Maharashtra | Uttar Pradesh | null>",
+  "districts": ["<Pune | Thane | Varanasi>"],
+  "sectors": ["<healthcare | water_sanitation | roads_transport | education>"],
+  "sort": "<priority_score_desc | demand_desc | investment_asc>",
+  "min_score": <0–100 integer or null>
 }}
 """.strip()
 
 
+# Sector keyword map for compound detection
+_SECTOR_KEYWORDS: list[tuple[str, list[str]]] = [
+    ("healthcare",       ["health", "hospital", "clinic", "doctor", "phc", "medical"]),
+    ("water_sanitation", ["water", "sanitation", "toilet", "sewage", "drainage", "borewell"]),
+    ("roads_transport",  ["road", "transport", "bus", "bridge", "highway", "pothole"]),
+    ("education",        ["school", "education", "teacher", "classroom", "student"]),
+]
+
+
 def _parse_nl_query_deterministic(query: str) -> Dict[str, Any]:
-    """Fully deterministic NL query parser (always used in mock mode)."""
+    """
+    Fully deterministic NL query parser (always used in mock mode).
+    STEP 8: supports compound multi-sector, multi-district, and min_score.
+    """
     q = query.lower()
 
+    # State
     state_filter = None
     if "maharashtra" in q:
         state_filter = "Maharashtra"
     elif "uttar pradesh" in q or " up " in q:
         state_filter = "Uttar Pradesh"
 
-    district_filter = None
+    # Districts — collect all mentioned (compound support)
+    districts_found: list[str] = []
     for kw, name in _PILOT_DISTRICTS.items():
-        if kw in q:
-            district_filter = name
-            break
+        if kw in q and name not in districts_found:
+            districts_found.append(name)
+    district_filter = districts_found[0] if len(districts_found) == 1 else (None if not districts_found else None)
+    # For compound: store all in districts list
+    districts_list = districts_found or None
 
-    sector_filter = None
-    if any(w in q for w in ["health", "hospital", "clinic", "doctor"]):
-        sector_filter = "healthcare"
-    elif any(w in q for w in ["water", "sanitation", "toilet"]):
-        sector_filter = "water_sanitation"
-    elif any(w in q for w in ["road", "transport", "bus", "bridge"]):
-        sector_filter = "roads_transport"
-    elif any(w in q for w in ["school", "education", "teacher"]):
-        sector_filter = "education"
+    # Sectors — compound: collect all that match
+    sectors_found: list[str] = []
+    for sector, keywords in _SECTOR_KEYWORDS:
+        if any(w in q for w in keywords):
+            sectors_found.append(sector)
+    sector_filter = sectors_found[0] if len(sectors_found) == 1 else None
+    sectors_list = sectors_found or None
 
+    # Sort
     sort_by = "priority_score_desc"
     if any(w in q for w in ["under-funded", "low investment", "underfunded"]):
         sort_by = "investment_asc"
     elif any(w in q for w in ["most requests", "high demand"]):
         sort_by = "demand_desc"
 
+    # Min score threshold (e.g. "score above 70", "priority > 60")
+    min_score = None
+    score_match = re.search(r'(?:score|priority)\s*(?:above|over|>|>=)\s*(\d+)', q)
+    if score_match:
+        min_score = int(score_match.group(1))
+
     return {
         "state": state_filter,
         "district": district_filter,
+        "districts": districts_list,
         "sector": sector_filter,
+        "sectors": sectors_list,
         "sort": sort_by,
+        "min_score": min_score,
     }
 
 
 def parse_natural_language_query(query: str) -> Dict[str, Any]:
     """
     Converts a natural-language policymaker question into a structured filter.
+    STEP 8: supports compound sectors, districts list, and min_score.
     Gemini parses intent; backend executes the filter deterministically.
     """
     structured_filter = _parse_nl_query_deterministic(query)
 
-    # Live Gemini override
+    # Live Gemini override (merges into deterministic baseline)
     if not USE_MOCK_GEMINI and GEMINI_API_KEY:
         try:
             import google.generativeai as genai  # type: ignore
@@ -403,16 +479,20 @@ def parse_natural_language_query(query: str) -> Dict[str, Any]:
             if raw.startswith("```"):
                 raw = re.sub(r"```[a-z]*\n?", "", raw).replace("```", "").strip()
             parsed = json.loads(raw)
-            structured_filter = parsed
+            # Merge Gemini result over deterministic baseline
+            structured_filter.update({k: v for k, v in parsed.items() if v is not None})
         except Exception as exc:
             print(f"[WARN] Gemini NL query parse failed, using deterministic parser: {exc}")
 
     filt = structured_filter
+    sectors_str = ", ".join(filt.get("sectors") or ([filt["sector"]] if filt.get("sector") else ["All"]))
+    districts_str = ", ".join(filt.get("districts") or ([filt["district"]] if filt.get("district") else ["All"]))
     interpretation = (
         f"Filtering regions where state={filt.get('state') or 'All'}, "
-        f"district={filt.get('district') or 'All'}, "
-        f"sector={filt.get('sector') or 'All'}, "
-        f"sorted by {filt.get('sort', 'priority_score_desc')}."
+        f"district(s)={districts_str}, "
+        f"sector(s)={sectors_str}, "
+        f"sorted by {filt.get('sort', 'priority_score_desc')}"
+        + (f", min priority score={filt['min_score']}" if filt.get("min_score") else "") + "."
     )
 
     return {
