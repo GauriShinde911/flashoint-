@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: development-priority-intelligence
+    runtime: python
+    region: singapore
+    plan: free
+    buildCommand: pip install -r backend/requirements.txt && python scripts/ingest.py
+    startCommand: uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: USE_MOCK_GEMINI
+        value: "true"
+      - key: STORAGE_BACKEND
+        value: "sqlite"
+      - key: ENVIRONMENT
+        value: "production"
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: ALLOWED_ORIGINS
+        value: "https://development-priority-intel.web.app,https://development-priority-intel.firebaseapp.com,http://localhost:3000,http://127.0.0.1:3000"
