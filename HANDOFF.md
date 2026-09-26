@@ -12,7 +12,7 @@
 | **STEP 5** | Impact Measurement Engine (Pre vs Post completion comparison) | **DONE** |
 | **STEP 6** | Policymaker Dashboard (plain HTML+CSS+JS, Leaflet, 6 tabs, Voice, Offline fallback) | **DONE** |
 | **STEP 7** | Gemini understanding layer (ADK / pipeline, USE_MOCK_GEMINI) | **DONE** |
-| **STEP 8** | Gemini explanation layer + NL query (/explain, /query endpoints) | TODO |
+| **STEP 8** | Gemini explanation layer + NL query (/explain, /query endpoints) | **DONE** |
 | **STEP 9** | Backend API completion (CORS, validation, endpoints, tests) | TODO |
 | **STEP 10** | Deploy config (render.yaml, Firebase Hosting, GitHub Actions) | TODO |
 | **STEP 11** | BRICS + DPG docs (ARCHITECTURE.md, README.md, honest census note) | TODO |
@@ -79,7 +79,16 @@ uvicorn backend.app.main:app --reload --port 8000
   - Compares citizen request volume in equal time windows (e.g. 90/180 days) BEFORE vs AFTER project completion dates.
   - Seeded 3 completed government projects (`data/synthetic/completed_projects.json`) with before/after request timestamps demonstrating demand reduction.
   - Includes mandatory disclaimer: `"based on available data, not a guarantee"`.
-- **Tests**: 68/70 tests passing across all test modules. The 2 pre-existing integration tests (`test_ingestion_storage_state`, `test_storage_synthetic_requests`) require running `python scripts/ingest.py` to seed the SQLite DB first — they pass after seeding.
+- **Tests**: 112/114 tests passing. The 2 pre-existing integration tests (`test_ingestion_storage_state`, `test_storage_synthetic_requests`) require `python scripts/ingest.py` to seed SQLite first.
+- **Gemini Explanation Layer (STEP 8)**:
+  - `generate_grounded_explanation()` now returns `evidence_summary` (structured block with `population_readable`), `data_quality` badge, `rank`, `explanation_mode` (`deterministic` | `gemini_rephrased`), and `state`.
+  - Deterministic baseline text built by `_build_explanation_text()` — always safe, fully unit-testable offline.
+  - Live Gemini rephrases prose only; numbers are never altered.
+  - Backward-compatible: `grounded_inputs` and `footnote` still present.
+- **NL Query Parser (STEP 8)**:
+  - `_parse_nl_query_deterministic()` now detects compound multi-sector queries (returns `sectors` list), compound districts (returns `districts` list), and `min_score` threshold.
+  - `/query` route applies sector + min_score filters and deterministic sort (`priority_score_desc` | `demand_desc` | `investment_asc`) on the backend.
+  - `/explain` endpoint passes `rank` from district aggregates into explanation output.
 - **Gemini Understanding Layer (STEP 7)**:
   - Restructured `backend/services/gemini_service.py` as a clean 4-stage pipeline:
     - Stage 1: Language detection (en/hi/mr via Devanagari heuristics)
@@ -92,7 +101,9 @@ uvicorn backend.app.main:app --reload --port 8000
   - 44 new unit tests added in `tests/test_gemini_service.py`; all pass offline
 
 ## Known Gaps
-- `POST /requests` uses a simple district heuristic for location extraction. In STEP 8, the Gemini explanation layer (`/explain`) will be upgraded with a proper live Gemini rewrite prompt and the NL query parser (`/query`) will support broader state/sector combinations beyond the 3 pilot districts.
+- CORS configuration is `allow_origins=["*"]` — needs tightening for production (STEP 9).
+- Input validation (e.g. max text length for `/requests`, query string sanitation for `/query`) not yet enforced — STEP 9.
+- No request-level rate limiting yet — STEP 9.
 
 ---
 
@@ -115,4 +126,4 @@ uvicorn backend.app.main:app --reload --port 8000
 ---
 
 ## NEXT STEP
-Proceed to **STEP 8 — Gemini explanation layer + NL query endpoints**. Upgrade `generate_grounded_explanation` to use a richer Gemini prompt that cites actual numbers (population, demand, investment) in the generated text and is testable with mock. Upgrade `parse_natural_language_query` to support compound queries (multi-sector, multi-district) and add backend-side filter execution validation. Endpoints: `GET /explain/{district_name}` and `POST /query`. Add unit + integration tests. Target: all 70/70 tests passing after running ingest.py.
+Proceed to **STEP 9 — Backend API completion**. Tasks: (1) tighten CORS to allowed origins list, (2) add Pydantic input validation to all request models (max text length, enum constraints), (3) add `/api/v1/` prefix consistently via APIRouter, (4) add 422-validation-error tests, (5) fix the `datetime.utcnow()` deprecation warning with `datetime.now(datetime.UTC)`. Target: all 114/114 tests passing (including the 2 integration tests after `python scripts/ingest.py`).
